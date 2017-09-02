@@ -1,19 +1,15 @@
 package tdanford.ideals;
 
-import org.junit.*;
-import java.util.regex.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
 
 public class MonomialTest {
 
-    public static final Pattern exponentiated = Pattern.compile("([a-zA-Z][a-zA-Z0-9_\\-]*^\\d+)+");
-
-
-    @Test
-    public void testDivides() {
-        Rationals field = new Rationals();
-
-        //Monomial m1 = new Monomial(field, new Rational(1) );
-    }
-
+  @Test
+  public void testToString() {
+    assertThat(new Monomial(1).renderString(new String[] {"x"})).isEqualTo("");
+    assertThat(new Monomial(1, 0, 1).renderString(new String[] {"x"})).isEqualTo("x");
+    assertThat(new Monomial(1, 0, 2).renderString(new String[] {"x"})).isEqualTo("x^2");
+  }
 
 }

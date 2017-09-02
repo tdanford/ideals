@@ -5,6 +5,7 @@ gradlew
 *.iml
 gradle/
 build/
+out/
 
 src/generated/
 

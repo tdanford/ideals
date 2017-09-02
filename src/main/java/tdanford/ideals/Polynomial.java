@@ -1,16 +1,40 @@
 package tdanford.ideals;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Polynomial<K, F extends Ring<K, K>> {
 
   private final PolynomialRing<K, F> polyRing;
   private final Map<Monomial, K> terms;
   private final ArrayList<Monomial> sorted;
+
+  public Polynomial(
+    final PolynomialRing<K, F> polyRing,
+    final K constant
+  ) {
+    this(polyRing, constant, new Monomial(polyRing.variables().length));
+  }
+
+  public Polynomial(
+    final PolynomialRing<K, F> polyRing,
+    final Term<K, F> term
+  ) {
+    this(polyRing, term.getCoefficient(), term.getMonomial());
+  }
+
+  public Polynomial(
+    final PolynomialRing<K, F> polyRing,
+    final K coefficient,
+    final Monomial monomial
+  ) {
+    this(polyRing, Collections.singletonMap(monomial, coefficient));
+  }
 
   public Polynomial(
     final PolynomialRing<K, F> polyRing,
@@ -26,6 +50,34 @@ public class Polynomial<K, F extends Ring<K, K>> {
 
     this.sorted = new ArrayList<>(terms.keySet());
     Collections.sort(this.sorted, polyRing.getOrdering());
+  }
+
+  public String toString() {
+    final K one = polyRing.coefficientField().one();
+    return String.format("%s", sorted.stream()
+      .map(m -> !terms.get(m).equals(one) ?
+        String.format("%s%s", terms.get(m), m.renderString(polyRing.variables())) :
+        (m.isZero() ? "1" : String.valueOf(m.renderString(polyRing.variables()))))
+      .collect(joining(" + ")));
+  }
+
+  public int hashCode() {
+    return 37 * (
+      17 + terms.entrySet().stream().mapToInt(e -> 37 * (Objects.hash(e.getKey(), e.getValue())))
+      .sum()
+    );
+  }
+
+  public boolean equals(final Object o) {
+    if (!(o instanceof Polynomial)) { return false; }
+    final Polynomial<K, F> p = (Polynomial<K, F>) o;
+    if (sorted.size() != p.sorted.size()) { return false; }
+    for (Monomial m : sorted) {
+      if (!p.terms.containsKey(m) || !p.terms.get(m).equals(terms.get(m))) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public Term<K, F> leadingTerm() {

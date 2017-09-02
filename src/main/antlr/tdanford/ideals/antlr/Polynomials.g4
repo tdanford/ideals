@@ -23,9 +23,13 @@ exp_var
   | var '^' exponent   # ExponentiatedVar
   ;
 
-coefficient : INTEGER_LITERAL | NUMERIC_LITERAL ;
+coefficient : integer | rational | decimal ;
 
-exponent : INTEGER_LITERAL ;
+rational : '-'? INTEGRAL '/' INTEGRAL ;
+integer : '-'? INTEGRAL ;
+decimal : '-' ? FLOATING_POINT ;
+
+exponent : INTEGRAL ;
 var : VARIABLE ;
 
 /* Lexer rules
@@ -46,13 +50,11 @@ STRING_LITERAL
   : '\'' (ESC | ~ ['\\])* '\''
   ;
 
-INTEGER_LITERAL
-  : '-'? DIGIT+
-  ;
+INTEGRAL : DIGIT+ ;
 
-NUMERIC_LITERAL
-  : '-'? DIGIT+ ( '.' DIGIT* )? ( E [-+]? DIGIT+ )?
-  | '-'? '.' DIGIT+ ( E [-+]? DIGIT+ )?
+FLOATING_POINT
+  : DIGIT+ ( '.' DIGIT* )? ( E [-+]? DIGIT+ )?
+  | '.' DIGIT+ ( E [-+]? DIGIT+ )?
   ;
 
 SPACES

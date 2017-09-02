@@ -10,9 +10,12 @@ ext {
 }
 
 versions += [
-    antlr             : '4.5.3'
+    eclipseCollections : '8.0.0',
+    antlr              : '4.5.3'
 ]
 
 libs += [
+	gsCollections        : ["org.eclipse.collections:eclipse-collections:${versions.eclipseCollections}",
+                            "org.eclipse.collections:eclipse-collections-api:${versions.eclipseCollections}"],
     antlr                : "org.antlr:antlr4:${versions.antlr}"
 ]

@@ -1,11 +1,47 @@
 package tdanford.ideals;
 
+import static java.util.stream.Collectors.joining;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 public class Monomial {
+
+  private static int[] single(final int len, final int idx, final int exp) {
+    final int[] arry = new int[len];
+    for (int i = 0; i < arry.length; i++) { arry[i] = i == idx ? exp : 0; }
+    return arry;
+  }
+
+  private static int[] empty(final int len) {
+    final int[] arry = new int[len];
+    for (int i = 0; i < arry.length; i++) { arry[i] = 0; }
+    return arry;
+  }
 
   private int[] exponents;
 
+  public Monomial(final int width, final int var, final int exp) {
+    this(single(width, var, exp));
+  }
+
   public Monomial(int[] exponents) {
     this.exponents = exponents;
+  }
+
+  public Monomial(final int numVars) {
+    this(empty(numVars));
+  }
+
+  public int hashCode() {
+    return Arrays.hashCode(exponents);
+  }
+
+  public boolean equals(final Object o) {
+    if (!(o instanceof Monomial)) { return false; }
+    final Monomial m = (Monomial) o;
+    return Arrays.equals(exponents, m.exponents);
   }
 
   public <K, D, F extends Ring<K, D>> K evaluate(final K[] values, final F ring) {
@@ -34,6 +70,7 @@ public class Monomial {
     return result;
   }
 
+  public int width() { return exponents.length; }
   public Integer exponent(final int i) {
     return exponents[i];
   }
@@ -74,5 +111,19 @@ public class Monomial {
     final int[] arr = new int[len];
     for (int i = 0; i < arr.length; i++) { arr[i] = 0; }
     return new Monomial(arr);
+  }
+
+  public boolean isZero() {
+    for (int v : exponents) { if (v != 0) { return false; } }
+    return true;
+  }
+
+  public String renderString(final String[] variables) {
+    return IntStream.range(0, variables.length)
+      .filter(i -> exponents[i] != 0)
+      .mapToObj(i -> exponents[i] > 1 ?
+        String.format("%s^%d", variables[i], exponents[i]) :
+        variables[i])
+      .collect(joining("")).trim();
   }
 }

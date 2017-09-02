@@ -8,7 +8,7 @@ import java.util.Collections;
 public class Kx<K, F extends Field<K>> extends PolynomialRing<K, F> {
 
   public Kx(final F field) {
-    super(new LexOrdering("x"), field, "x");
+    super(MonomialOrdering.LEX, field, "x");
   }
 
   public Polynomial<K, F> gcd(final Polynomial<K, F> f, final Polynomial<K, F> g) {

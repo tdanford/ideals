@@ -1,6 +1,27 @@
 package tdanford.ideals;
 
-public class Rationals implements Field<Rational> {
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public enum Rationals implements Field<Rational> {
+
+  FIELD ;
+
+  private static Pattern rationalPattern = Pattern.compile("(-?\\d+)(/(\\d+))?");
+
+  public static Rational parse(final String strValue) {
+    final Matcher m = rationalPattern.matcher(strValue);
+    if (m.matches()) {
+      final Integer numer = Integer.parseInt(m.group(1));
+
+      final String group2 = m.group(2);
+      final Integer denom = group2 != null && group2.length() > 0 ? Integer.parseInt(m.group(3)) : 1;
+      return new Rational(numer, denom);
+    } else {
+      throw new IllegalArgumentException(String.format("Can't parse a Rational from \"%s\"", strValue));
+    }
+  }
+
   @Override
   public Rational reciprocal(Rational value) {
     return value.inverse();

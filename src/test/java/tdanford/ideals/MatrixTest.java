@@ -6,12 +6,10 @@ import static org.junit.Assert.*;
 
 public class MatrixTest {
 
-    public static final Rationals f = new Rationals();
-
     public static Rational r(int n, int d) { return new Rational(n, d); }
 
     public static Matrix<Rational, Rationals> matrix(int rows, int cols, Rational... rat) {
-        return new Matrix<Rational, Rationals>(rows, cols, f, rat);
+        return new Matrix<>(rows, cols, Rationals.FIELD, rat);
     }
 
     @Test

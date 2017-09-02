@@ -49,6 +49,10 @@ public class Rational {
     denom /= gcd;
   }
 
+  public String toString() {
+    return denom != 1 ? String.format("%d/%d", numer, denom) : String.valueOf(numer);
+  }
+
   public int hashCode() {
     return Objects.hash(numer, denom);
   }
