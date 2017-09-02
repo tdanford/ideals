@@ -1,0 +1,18 @@
+// Based on
+// https://github.com/granthenke/spark-demo/blob/master/gradle/dependencies.gradle
+//
+// This file exports a map called "libs" whose key is a library and value is the
+// locator (including version) for that library
+
+ext {
+    libs = [:]
+    versions = [:]
+}
+
+versions += [
+    antlr             : '4.5.3'
+]
+
+libs += [
+    antlr                : "org.antlr:antlr4:${versions.antlr}"
+]

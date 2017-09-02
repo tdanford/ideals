@@ -1,48 +1,78 @@
 package tdanford.ideals;
 
-import java.util.*;
+public class Monomial {
 
-public class Monomial<K, F extends Field<K>> {
+  private int[] exponents;
 
-    private F field;
-    private K coefficient;
-    private Map<String,Integer> exponents;
+  public Monomial(int[] exponents) {
+    this.exponents = exponents;
+  }
 
-    public Monomial(F field, K coeff, Map<String,Integer> vars) {
-        this.field = field;
-        this.coefficient = coeff;
-        this.exponents = vars;
+  public <K, D, F extends Ring<K, D>> K evaluate(final K[] values, final F ring) {
+    K result = ring.zero();
+
+    for (int i = 0; i < exponents.length; i++) {
+      if (exponents[i] > 0) {
+        result = ring.product(result, exponentiate(ring, values[i], exponents[i]));
+      }
     }
 
-    public String[] variables() { return exponents.keySet().toArray(new String[exponents.size()]); }
+    return result;
+  }
 
-    public boolean hasVariable(String var) { return exponents.containsKey(var); }
+  private <K, D, F extends Ring<K, D>> K exponentiate(final F ring, K base, int exp) {
+    K result = base;
+    while (exp > 1) {
+      if (exp % 2 == 0) {
+        exp /= 2;
+        result = ring.product(result, result);
+      } else {
+        exp -= 1;
+        result = ring.product(result, base);
+      }
+    }
+    return result;
+  }
 
-    public Integer exponent(String var) { return exponents.containsKey(var) ? exponents.get(var) : 0; }
+  public Integer exponent(final int i) {
+    return exponents[i];
+  }
 
-    public K getCoefficient() { return coefficient; }
-
-    public boolean divides(Monomial<K, F> m) {
-        for(String var : exponents.keySet()) {
-            if(!m.hasVariable(var)) { return false; }
-            Integer thisExp = exponents.get(var);
-            Integer thatExp = m.exponent(var);
-            if(thatExp < thisExp) { return false; }
-        }
-        return true;
+  public boolean divides(Monomial m) {
+    for (int i = 0; i < exponents.length; i++) {
+      if (exponents[i] > m.exponents[i]) {
+        return false;
+      }
     }
 
-    public Monomial<K,F> dividedBy(Monomial<K, F> m) {
-        if(!m.divides(this)) { throw new IllegalArgumentException(); }
+    return true;
+  }
 
-        K newCoeff = field.product(coefficient, field.reciprocal(m.coefficient));
-        TreeMap<String,Integer> exps = new TreeMap<String,Integer>();
-        for(String var : exponents.keySet()) {
-            exps.put(var, exponents.get(var) - m.exponent(var));
-        }
-
-        return new Monomial<K,F>(field, newCoeff, exps);
+  public Monomial dividedBy(final Monomial m) {
+    if (!m.divides(this)) {
+      throw new IllegalArgumentException();
     }
 
+    int[] newExponents = new int[exponents.length];
+    for (int i = 0; i < newExponents.length; i++) {
+      newExponents[i] = exponents[i] - m.exponents[i];
+    }
 
+    return new Monomial(newExponents);
+  }
+
+  public Monomial multipliedBy(final Monomial m) {
+    final int[] newExp = new int[exponents.length];
+    for (int i = 0; i < newExp.length; i++) {
+      newExp[i] = exponents[i] + m.exponents[i];
+    }
+    return new Monomial(newExp);
+  }
+
+
+  public static Monomial zero(final int len) {
+    final int[] arr = new int[len];
+    for (int i = 0; i < arr.length; i++) { arr[i] = 0; }
+    return new Monomial(arr);
+  }
 }

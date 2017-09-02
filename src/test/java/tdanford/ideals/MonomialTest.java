@@ -2,7 +2,6 @@ package tdanford.ideals;
 
 import org.junit.*;
 import java.util.regex.*;
-import static org.junit.Assert.*;
 
 public class MonomialTest {
 
@@ -11,7 +10,7 @@ public class MonomialTest {
 
     @Test
     public void testDivides() {
-        RationalField field = new RationalField();
+        Rationals field = new Rationals();
 
         //Monomial m1 = new Monomial(field, new Rational(1) );
     }
