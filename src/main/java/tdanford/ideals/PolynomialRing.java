@@ -1,13 +1,11 @@
 package tdanford.ideals;
 
 import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.eclipse.collections.impl.factory.Maps;
+import com.google.common.base.Preconditions;
 
 public class PolynomialRing<C, F extends Ring<C, C>> implements
-  Ring<Polynomial<C, F>, DivisorRemainder<Polynomial<C, F>>> {
+  Ring<Polynomial<C, F>, DivisorsRemainder<Polynomial<C, F>>> {
 
   private final MonomialOrdering ordering;
   private final F coefficientField;
@@ -31,6 +29,44 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
 
   public String[] variables() { return vars; }
 
+  public DivisorsRemainder<Polynomial<C, F>> div(final Polynomial<C, F> f, final Polynomial<C, F> ... fs) {
+    final Polynomial<C, F> zero = new Polynomial<>(this, Maps.mutable.empty());
+    Polynomial<C, F>[] as = new Polynomial[fs.length];
+    for (int i = 0; i < as.length; i++) { as[i] = zero; }
+
+    Polynomial<C, F> r = zero;
+    Polynomial<C, F> p = f;
+
+    while (!p.isZero()) {
+      int i = 0;
+      boolean divisionOccurred = false;
+      while (i < as.length && !divisionOccurred) {
+        Term<C, F> ltp = p.leadingTerm();
+        if (fs[i].leadingTerm().divides(ltp)) {
+          final Polynomial<C, F> ratio = lift(ltp.dividedBy(fs[i].leadingTerm()));
+          as[i] = sum(as[i], ratio);
+          p = subtract(p, product(ratio, fs[i]));
+          divisionOccurred = true;
+        } else {
+          i += 1;
+        }
+      }
+
+      if (!divisionOccurred) {
+        r = sum(r, lift(p.leadingTerm()));
+        p = subtract(p, lift(p.leadingTerm()));
+      }
+    }
+
+    return new DivisorsRemainder<>(r, as);
+  }
+
+  public Polynomial<C, F> subtract(final Polynomial<C, F> p1, final Polynomial<C, F> p2) {
+    return sum(p1, negative(p2));
+  }
+
+  private Polynomial<C, F> lift(final Term<C, F> term) { return new Polynomial<>(this, term); }
+
   @Override
   public Polynomial<C, F>[] array(final int length) {
     return new Polynomial[length];
@@ -43,6 +79,8 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
 
   @Override
   public Polynomial<C, F> sum(final Polynomial<C, F> a1, final Polynomial<C, F> a2) {
+    Preconditions.checkArgument(a1 != null, "Cannot add a null polynomial");
+    Preconditions.checkArgument(a2 != null, "Cannot add a null polynomial");
     return a1.addedTo(a2);
   }
 
@@ -70,7 +108,7 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
   }
 
   @Override
-  public DivisorRemainder<Polynomial<C, F>> divide(final Polynomial<C, F> numer, final Polynomial<C, F> denom) {
+  public DivisorsRemainder<Polynomial<C, F>> divide(final Polynomial<C, F> numer, final Polynomial<C, F> denom) {
     throw new UnsupportedOperationException("can't divide yet");
   }
 

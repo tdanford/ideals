@@ -43,7 +43,7 @@ an IDENTIFIER.
 SEP : ';';
 
 VARIABLE
-  : [a-zA-Z_] [a-zA-Z_0-9]*
+  : [a-zA-Z] [0-9]*
   ;
 
 STRING_LITERAL

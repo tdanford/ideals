@@ -1,6 +1,5 @@
 package tdanford.ideals;
 
-import java.util.Collections;
 import java.util.stream.StreamSupport;
 
 /**
@@ -23,7 +22,7 @@ public class Kx<K, F extends Field<K>> extends PolynomialRing<K, F> {
 
     while (!s.isZero()) {
       //System.out.println(String.format("h=%s, s=%s", h, s));
-      final DivisorRemainder<Polynomial<K, F>> divRem = div(h, s);
+      final DivisorsRemainder<Polynomial<K, F>> divRem = div(h, s);
       //System.out.println(String.format("\tdivisor=%s, remainder=%s", divRem.divisor, divRem.remainder));
       h = s;
       s = divRem.remainder;
@@ -34,7 +33,7 @@ public class Kx<K, F extends Field<K>> extends PolynomialRing<K, F> {
     return h.scaleBy(coefficientField().reciprocal(lc));
   }
 
-  public DivisorRemainder<Polynomial<K, F>> div(final Polynomial<K, F> f, final Polynomial<K, F> g) {
+  public DivisorsRemainder<Polynomial<K, F>> div(final Polynomial<K, F> f, final Polynomial<K, F> g) {
     Polynomial<K, F> q = zero(), r = f;
     while (!r.isZero() && g.leadingTerm().divides(r.leadingTerm())) {
       final Polynomial<K, F> divided = lift(r.leadingTerm().dividedBy(g.leadingTerm()));
@@ -42,7 +41,7 @@ public class Kx<K, F extends Field<K>> extends PolynomialRing<K, F> {
       r = subtract(r, product(divided, g));
     }
 
-    return new DivisorRemainder<>(q, r);
+    return new DivisorsRemainder<>(r, q);
   }
 
   public Polynomial<K, F> subtract(final Polynomial<K, F> p1, final Polynomial<K, F> p2) {
