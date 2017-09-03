@@ -118,6 +118,31 @@ public class Polynomial<K, F extends Ring<K, K>> {
       "Term map must contain all monomials in sorted list");
   }
 
+  public Polynomial<K, F> sPolynomial(final Polynomial<K, F> g) {
+    final Polynomial<K, F> f = this;
+    final Term<K, F> fLT = f.leadingTerm();
+    final Term<K, F> gLT = g.leadingTerm();
+
+    final Monomial fgLCM = f.leadingMonomial().lcm(g.leadingMonomial());
+    final K one = polyRing.coefficientField().one();
+    final Term<K, F> xGamma = new Term<>(polyRing.coefficientField(), fgLCM, one);
+
+    return polyRing.subtract(
+      polyRing.product(
+        new Polynomial<>(polyRing, xGamma.dividedBy(fLT)),
+        f
+      ),
+      polyRing.product(
+        new Polynomial<>(polyRing, xGamma.dividedBy(gLT)),
+        g
+      )
+    );
+  }
+
+  public Monomial leadingMonomial() {
+    return sorted.get(0);
+  }
+
   public Term<K, F> leadingTerm() {
     checkInvariants();
     Preconditions.checkState(!sorted.isEmpty(), "Cannot find leading term of empty polynomial");

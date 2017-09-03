@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import com.google.common.base.Preconditions;
 
 public class Monomial {
 
@@ -73,6 +74,20 @@ public class Monomial {
   public int width() { return exponents.length; }
   public Integer exponent(final int i) {
     return exponents[i];
+  }
+
+  public Monomial lcm(final Monomial m) {
+    Preconditions.checkArgument(m != null,
+      "Cannot find LCM with null monomial");
+    Preconditions.checkArgument(m.exponents.length == exponents.length,
+      "Monomials must have same exponent length");
+
+    final int[] lcm = new int[exponents.length];
+    for (int i = 0; i < lcm.length; i++) {
+      lcm[i] = Math.max(exponents[i], m.exponents[i]);
+    }
+
+    return new Monomial(lcm);
   }
 
   public boolean divides(Monomial m) {
