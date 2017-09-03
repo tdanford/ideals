@@ -7,8 +7,8 @@ polynomials
 polynomial
   : term # Monomial
   | grouped_polynomial+ # Multiplication
-  | term '+' polynomial # Addition
-  | term '-' polynomial # Subtraction
+  | polynomial '+' term # Addition
+  | polynomial '-' term # Subtraction
   ;
 
 grouped_polynomial : '(' polynomial ')' ;

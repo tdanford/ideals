@@ -18,6 +18,8 @@ dependencies {
   antlr 'org.antlr:antlr4:4.5.3'
 
   compile libs.gsCollections
+	compile libs.commonsLang
+	compile libs.guava
 
   testCompile 'junit:junit:4.12'
   testCompile 'org.assertj:assertj-core:3.8.0'

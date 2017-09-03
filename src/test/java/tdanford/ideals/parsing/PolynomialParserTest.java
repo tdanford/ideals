@@ -24,5 +24,10 @@ public class PolynomialParserTest {
       .isEqualTo(new Polynomial<>(kx, Maps.mutable.of(
         new Monomial(1, 0, 2), one,
         new Monomial(1), one)));
+
+    assertThat(parser.apply("x^2 - 1"))
+      .isEqualTo(new Polynomial<>(kx, Maps.mutable.of(
+        new Monomial(1, 0, 2), one,
+        new Monomial(1), Rationals.FIELD.negative(one))));
   }
 }

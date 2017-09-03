@@ -1,6 +1,7 @@
 package tdanford.ideals.parsing;
 
 import static java.util.stream.Collectors.toMap;
+import static tdanford.ideals.MonomialOrdering.LEX;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.IntStream;
@@ -9,6 +10,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import tdanford.ideals.Monomial;
 import tdanford.ideals.Polynomial;
 import tdanford.ideals.PolynomialRing;
+import tdanford.ideals.Rational;
+import tdanford.ideals.Rationals;
 import tdanford.ideals.Ring;
 import tdanford.ideals.antlr.PolynomialsBaseVisitor;
 import tdanford.ideals.antlr.PolynomialsLexer;
@@ -16,6 +19,11 @@ import tdanford.ideals.antlr.PolynomialsParser;
 
 public class PolynomialParser<K, F extends Ring<K, K>, PR extends PolynomialRing<K, F>>
   implements Function<String, Polynomial<K, F>> {
+
+  public static Polynomial<Rational, Rationals> rationalPoly(final String str, final String... vars) {
+    return new PolynomialParser<>(new PolynomialRing<>(LEX, Rationals.FIELD, vars), Rationals::parse)
+      .apply(str);
+  }
 
   private final Function<String, K> constantParser;
   private final PR polyRing;
@@ -90,6 +98,7 @@ class PolynomialVisitor<K, F extends Ring<K, K>, PR extends PolynomialRing<K, F>
   @Override
   public Polynomial<K, F> visitConstantTerm(final PolynomialsParser.ConstantTermContext ctx) {
     final K coeff = constantParser.apply(ctx.coefficient().getText());
+    //System.out.println(String.format("CONSTANT PARSING: \"%s\" -> %s", ctx.coefficient().getText(), coeff));
     return new Polynomial<>(polyRing, coeff);
   }
 
@@ -103,15 +112,17 @@ class PolynomialVisitor<K, F extends Ring<K, K>, PR extends PolynomialRing<K, F>
 
   @Override
   public Polynomial<K, F> visitAddition(final PolynomialsParser.AdditionContext ctx) {
-    final Polynomial<K, F> termPoly = visit(ctx.term());
-    final Polynomial<K, F> restPoly = visit(ctx.polynomial());
+    final Polynomial<K, F> restPoly = visit(ctx.term());
+    final Polynomial<K, F> termPoly = visit(ctx.polynomial());
+    //System.out.println(String.format("ADDITION: %s PLUS %s", termPoly, restPoly));
     return termPoly.addedTo(restPoly);
   }
 
   @Override
   public Polynomial<K, F> visitSubtraction(final PolynomialsParser.SubtractionContext ctx) {
-    final Polynomial<K, F> termPoly = visit(ctx.term());
-    final Polynomial<K, F> restPoly = visit(ctx.polynomial());
+    final Polynomial<K, F> restPoly = visit(ctx.term());
+    final Polynomial<K, F> termPoly = visit(ctx.polynomial());
+    //System.out.println(String.format("SUBTRACTION: %s MINUS %s", termPoly, restPoly));
 
     final F ring = polyRing.coefficientField();
     final K negativeOne = ring.negative(ring.one());

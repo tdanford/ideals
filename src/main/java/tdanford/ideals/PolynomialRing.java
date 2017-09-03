@@ -23,25 +23,6 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
     this.vars = vars;
   }
 
-  private static Pattern EXPONENTIATED = Pattern.compile("^([a-z]+)(\\^\\d*)");
-
-  public Monomial parseMonomial(final String str) {
-    int start = 0;
-    Matcher m = EXPONENTIATED.matcher(str);
-    final Map<String, Integer> exps = new TreeMap<>();
-    while (m.find(start)) {
-      start = m.end();
-      final int exponent = m.group(2).length() > 0 ? Integer.parseInt(m.group(2).substring(1)) : 1;
-      exps.put(m.group(1), exponent);
-    }
-
-    final int[] array = new int[vars.length];
-    for (int i = 0; i < array.length; i++) {
-      array[i] = exps.containsKey(vars[i]) ? exps.get(vars[i]) : 0;
-    }
-    return new Monomial(array);
-  }
-
   public MonomialOrdering getOrdering() {
     return ordering;
   }
@@ -49,15 +30,6 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
   public F coefficientField() { return coefficientField; }
 
   public String[] variables() { return vars; }
-
-  public int variableIndex(final String var) {
-    for (int i = 0; i < vars.length; i++) {
-      if (vars[i].equals(var)) {
-        return i;
-      }
-    }
-    return -1;
-  }
 
   @Override
   public Polynomial<C, F>[] array(final int length) {

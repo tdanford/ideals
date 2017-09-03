@@ -44,7 +44,11 @@ public class Rational {
   }
 
   private void reduce() {
-    int gcd = gcd(numer, denom);
+    if (denom < 0) {
+      denom = -denom;
+      numer = -numer;
+    }
+    int gcd = gcd(Math.abs(numer), denom);
     numer /= gcd;
     denom /= gcd;
   }

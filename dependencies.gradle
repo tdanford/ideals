@@ -11,11 +11,16 @@ ext {
 
 versions += [
     eclipseCollections : '8.0.0',
+		commonsLang        : '3.5',
+		guava              : '19.0',
     antlr              : '4.5.3'
 ]
 
 libs += [
 	gsCollections        : ["org.eclipse.collections:eclipse-collections:${versions.eclipseCollections}",
                             "org.eclipse.collections:eclipse-collections-api:${versions.eclipseCollections}"],
+  commonsLang          : "org.apache.commons:commons-lang3:${versions.commonsLang}",
+	guava                : "com.google.guava:guava:${versions.guava}",
     antlr                : "org.antlr:antlr4:${versions.antlr}"
+
 ]
