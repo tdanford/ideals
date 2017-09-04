@@ -141,4 +141,8 @@ public class Monomial {
         variables[i])
       .collect(joining("")).trim();
   }
+
+  public int degree() {
+    return IntStream.of(exponents).sum();
+  }
 }
