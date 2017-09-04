@@ -1,6 +1,7 @@
 package tdanford.ideals;
 
 import java.util.Collections;
+import java.util.stream.StreamSupport;
 import org.eclipse.collections.impl.factory.Maps;
 import com.google.common.base.Preconditions;
 
@@ -28,6 +29,10 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
   public F coefficientField() { return coefficientField; }
 
   public String[] variables() { return vars; }
+
+  public DivisorsRemainder<Polynomial<C, F>> div(final Polynomial<C, F> f, final Iterable<Polynomial<C, F>> fs) {
+    return div(f, StreamSupport.stream(fs.spliterator(), false).toArray(Polynomial[]::new));
+  }
 
   public DivisorsRemainder<Polynomial<C, F>> div(final Polynomial<C, F> f, final Polynomial<C, F> ... fs) {
     final Polynomial<C, F> zero = new Polynomial<>(this, Maps.mutable.empty());
@@ -109,7 +114,7 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
 
   @Override
   public DivisorsRemainder<Polynomial<C, F>> divide(final Polynomial<C, F> numer, final Polynomial<C, F> denom) {
-    throw new UnsupportedOperationException("can't divide yet");
+    return div(numer, denom);
   }
 
 }
