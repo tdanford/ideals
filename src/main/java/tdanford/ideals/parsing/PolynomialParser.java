@@ -2,11 +2,13 @@ package tdanford.ideals.parsing;
 
 import static java.util.stream.Collectors.toMap;
 import static tdanford.ideals.MonomialOrdering.LEX;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
+import com.google.common.base.Preconditions;
 import tdanford.ideals.Monomial;
 import tdanford.ideals.Polynomial;
 import tdanford.ideals.PolynomialRing;
@@ -63,7 +65,14 @@ class MonomialVisitor
 
   @Override
   public Monomial visitExponentiatedVar(final PolynomialsParser.ExponentiatedVarContext ctx) {
+    Preconditions.checkState(vars != null, "vars cannot be null");
+    Preconditions.checkState(indices != null, "indices cannot be null");
+
     final String var = ctx.var().getText();
+
+    Preconditions.checkState(indices.containsKey(var), String.format(
+      "indices %s doesn't contain var %s", indices.keySet(), var));
+
     final int exp = Integer.parseInt(ctx.exponent().getText());
     return new Monomial(vars.length, indices.get(var), exp);
   }

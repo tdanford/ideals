@@ -1,6 +1,8 @@
 package tdanford.ideals;
 
+import static java.util.stream.Collectors.toList;
 import static tdanford.ideals.parsing.PolynomialParser.rationalPoly;
+import java.util.stream.Stream;
 
 public abstract class PolynomialTesting {
 
@@ -16,4 +18,9 @@ public abstract class PolynomialTesting {
     return rationalPoly(str, KXY.variables());
   }
 
+  public static PolynomialSet<Rational, Rationals> kxPolys(final String... strs) {
+    return new PolynomialSet<>(
+      Stream.of(strs).map(PolynomialTesting::kxyPoly).collect(toList())
+    );
+  }
 }

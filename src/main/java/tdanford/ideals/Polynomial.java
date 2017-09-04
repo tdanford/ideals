@@ -1,6 +1,5 @@
 package tdanford.ideals;
 
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import java.util.Collections;
@@ -8,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.eclipse.collections.api.block.predicate.Predicate;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.ImmutableMap;
@@ -218,6 +218,12 @@ public class Polynomial<K, F extends Ring<K, K>> {
 
   public K leadingCoefficient() {
     return terms.get(sorted.get(0));
+  }
+
+  public boolean anyTermMatches(final Predicate<Term<K, F>> pred) {
+    return sorted.anySatisfy(m -> pred.accept(
+      new Term<>(polyRing.coefficientField(), m, terms.get(m))
+    ));
   }
 }
 
