@@ -1,31 +1,36 @@
 package tdanford.ideals;
 
 import java.util.Objects;
+import com.google.common.base.Preconditions;
 
 public class Rational {
 
-  private int numer, denom;
+  private long numer, denom;
 
-  public Rational(final int num, final int denom) {
+  public Rational(final long num, final long denom) {
     this.numer = num;
     this.denom = denom;
+
+    Preconditions.checkArgument(denom != 0 || num == 0, "Cannot have zero denominator without zero numerator");
     reduce();
   }
 
-  public Rational(final int num) {
+  public Rational(final long num) {
     this.numer = num;
     this.denom = 1;
   }
 
-  private static int gcd(final int astart, final int bstart) {
-    int a = astart, b = bstart;
+  private static long gcd(final long astart, final long bstart) {
+    long a = astart, b = bstart;
     while (b != 0) {
-      int t = b;
+      long t = b;
       b = a % b;
       a = t;
     }
     return a;
   }
+
+  public boolean isZero() { return numer == 0; }
 
   public Rational product(final Rational r) {
     return new Rational(numer * r.numer, denom * r.denom);
@@ -44,17 +49,31 @@ public class Rational {
   }
 
   private void reduce() {
-    if (denom < 0) {
-      denom = -denom;
-      numer = -numer;
+    if (denom != 0) {
+
+      if (denom < 0) {
+        denom = -denom;
+        numer = -numer;
+      }
+
+      long gcd = gcd(Math.abs(numer), denom);
+
+      if (gcd == 0) {
+        throw new IllegalStateException(String.format("GCD(%d, %d) returned 0", Math.abs(numer), denom));
+      }
+      numer /= gcd;
+      denom /= gcd;
     }
-    int gcd = gcd(Math.abs(numer), denom);
-    numer /= gcd;
-    denom /= gcd;
   }
 
   public String toString() {
-    return denom != 1 ? String.format("%d/%d", numer, denom) : String.valueOf(numer);
+    if (denom == 0) {
+      return "0";
+    } else if (denom == 1) {
+      return String.valueOf(numer);
+    } else {
+      return String.format("%d/%d", numer, denom);
+    }
   }
 
   public int hashCode() {

@@ -22,7 +22,7 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
     this.polyRing = polyRing;
     spec = Lists.immutable.ofAll(polys);
     basis = Lists.mutable.empty();
-    reducingFinalBasis = false;
+    reducingFinalBasis = true;
     calculateBasis();
   }
 
@@ -63,13 +63,19 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
     final Set<Term<K, F>> lts = buildingSet.leadingTerms();
 
     basis.clear();
+    basis.addAllIterable(buildingSet);
+
+    scaleLeadingCoefficientsToOne();
+
     if (reducingFinalBasis) {
       System.out.println("Reducing final set...");
-      basis.addAllIterable(buildingSet.filter(new ReducedPolynomialPredicate<>(lts)));
-    } else {
-      basis.addAllIterable(buildingSet);
+      //basis.addAllIterable(buildingSet.filter(new ReducedPolynomialPredicate<>(lts)));
+      int reduce = -1;
+      while ((reduce = findReduciblePolynomial(basis)) != -1) {
+        basis.remove(reduce);
+      }
+
     }
-    scaleLeadingCoefficientsToOne();
 
     System.out.println(String.format("Final basis: %s", basis));
 
@@ -77,6 +83,27 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
 
   private void scaleLeadingCoefficientsToOne() {
     basis.replaceAll(Polynomial::scaleToOne);
+  }
+
+  private int findReduciblePolynomial(final MutableList<Polynomial<K, F>> basis) {
+    for (int i = 0; i < basis.size(); i++) {
+      if (isReduciblePolynomial(basis.get(i), basis)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private boolean isReduciblePolynomial(
+    final Polynomial<K, F> poly,
+    final MutableList<Polynomial<K, F>> basis
+  ) {
+    final Set<Term<K, F>> leadingTerms = basis.collectIf(
+      p -> !p.equals(poly),
+      Polynomial::leadingTerm
+    ).toSet();
+
+    return poly.anyTermMatches(leadingTerms::contains);
   }
 
 }

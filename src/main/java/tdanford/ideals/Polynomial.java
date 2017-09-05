@@ -2,13 +2,15 @@ package tdanford.ideals;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.eclipse.collections.api.block.predicate.Predicate;
-import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.impl.factory.Lists;
@@ -18,8 +20,8 @@ import com.google.common.base.Preconditions;
 public class Polynomial<K, F extends Ring<K, K>> {
 
   private final PolynomialRing<K, F> polyRing;
-  private final ImmutableMap<Monomial, K> terms;
-  private final ImmutableList<Monomial> sorted;
+  private final K[] terms;
+  private final Monomial[] sorted;
 
   public Polynomial(
     final PolynomialRing<K, F> polyRing,
@@ -52,34 +54,38 @@ public class Polynomial<K, F extends Ring<K, K>> {
   ) {
     this.polyRing = polyRing;
     final K zero = polyRing.coefficientField().zero();
-    this.terms = Maps.immutable.ofMap(terms.entrySet().stream()
+
+    final ImmutableMap<Monomial, K> tempMap = Maps.immutable.ofMap(terms.entrySet().stream()
       .filter(e -> !e.getValue().equals(zero))
       .collect(toMap(
         Map.Entry::getKey, Map.Entry::getValue
       )));
 
-    final MutableList<Monomial> toSort = Lists.mutable.ofAll(this.terms.keysView());
+    final MutableList<Monomial> toSort = Lists.mutable.ofAll(tempMap.keysView());
     toSort.sort(polyRing.getOrdering());
 
-    this.sorted = toSort.toImmutable();
+    this.sorted = toSort.toArray(new Monomial[toSort.size()]);
+    this.terms = polyRing.coefficientField().array(this.sorted.length);
+
+    for (int i = 0; i < sorted.length; i++) {
+      this.terms[i] = tempMap.get(sorted[i]);
+    }
 
     checkInvariants();
   }
 
   public List<Term<K, F>> getTerms() {
-    return sorted.castToList().stream()
-      .map(m -> new Term<>(polyRing.coefficientField(), m, terms.get(m)))
+    return IntStream.range(0, sorted.length)
+      .mapToObj(i -> new Term<>(polyRing.coefficientField(), sorted[i], terms[i]))
       .collect(toList());
   }
 
   public String toString() {
     final K one = polyRing.coefficientField().one();
-    //if (sorted.isEmpty()) { return "0"; }
-    return String.format("%s", sorted.collect(
-      m -> !terms.get(m).equals(one) ?
-        String.format("%s%s", terms.get(m), m.renderString(polyRing.variables())) :
-        (m.isZero() ? "1" : String.valueOf(m.renderString(polyRing.variables()))))
-      .toList().stream()
+    return String.format("%s", IntStream.range(0, sorted.length).mapToObj(
+      i -> !terms[i].equals(one) ?
+        String.format("%s%s", terms[i], sorted[i].renderString(polyRing.variables())) :
+        (sorted[i].isZero() ? "1" : String.valueOf(sorted[i].renderString(polyRing.variables()))))
       .reduce((a, b) -> {
         if (b.startsWith("-")) {
           return String.format("%s - %s", a, b.substring(1));
@@ -91,31 +97,22 @@ public class Polynomial<K, F extends Ring<K, K>> {
     );
   }
 
-  public int hashCode() {
-    return 37 * (
-      17 + (int) terms.collectInt(
-        e -> 37 * (Objects.hash(e) + Objects.hash(terms.get(e)))
-      ).toList().sum()
-    );
+  public final int hashCode() {
+    return 37 * (IntStream.range(0, sorted.length)
+      .map(i -> 37 * (Objects.hash(sorted[i]) + Objects.hash(terms[i])))
+      .sum());
   }
 
-  public boolean equals(final Object o) {
+  public final boolean equals(final Object o) {
     if (!(o instanceof Polynomial)) { return false; }
     final Polynomial<K, F> p = (Polynomial<K, F>) o;
-    if (sorted.size() != p.sorted.size()) { return false; }
-    for (Monomial m : sorted) {
-      if (!p.terms.containsKey(m) || !p.terms.get(m).equals(terms.get(m))) {
-        return false;
-      }
-    }
-    return true;
+    return Arrays.deepEquals(sorted, p.sorted) &&
+      Arrays.deepEquals(terms, p.terms);
   }
 
   private void checkInvariants() {
-    Preconditions.checkState(sorted.size() == terms.size(),
+    Preconditions.checkState(sorted.length == terms.length,
       "Sorted monomial list and term map must have same size");
-    Preconditions.checkState(sorted.allSatisfy(terms::containsKey),
-      "Term map must contain all monomials in sorted list");
   }
 
   public Polynomial<K, F> sPolynomial(final Polynomial<K, F> g) {
@@ -140,14 +137,13 @@ public class Polynomial<K, F extends Ring<K, K>> {
   }
 
   public Monomial leadingMonomial() {
-    return sorted.get(0);
+    return sorted[0];
   }
 
   public Term<K, F> leadingTerm() {
     checkInvariants();
-    Preconditions.checkState(!sorted.isEmpty(), "Cannot find leading term of empty polynomial");
-    Preconditions.checkState(terms.containsKey(sorted.get(0)), "Term map must contain leading monomial");
-    return new Term<>(polyRing.coefficientField(), sorted.get(0), terms.get(sorted.get(0)));
+    Preconditions.checkState(sorted.length > 0, "Cannot find leading term of empty polynomial");
+    return new Term<>(polyRing.coefficientField(), sorted[0], terms[0]);
   }
 
   public K evaluate(K[] values) {
@@ -162,18 +158,15 @@ public class Polynomial<K, F extends Ring<K, K>> {
     final F field = polyRing.coefficientField();
     final Map<Monomial, K> newTerms = new HashMap<>();
 
-    for (final Monomial m : sorted) {
-
-      if (p.terms.containsKey(m)) {
-        newTerms.put(m, field.sum(terms.get(m), p.terms.get(m)));
-      } else {
-        newTerms.put(m, terms.get(m));
-      }
+    for (int i = 0; i < sorted.length; i++) {
+      newTerms.put(sorted[i], terms[i]);
     }
 
-    for (final Monomial m : p.sorted) {
-      if (!terms.containsKey(m)) {
-        newTerms.put(m, p.terms.get(m));
+    for (int i = 0; i < p.sorted.length; i++) {
+      if (newTerms.containsKey(p.sorted[i])) {
+        newTerms.put(p.sorted[i], field.sum(newTerms.get(p.sorted[i]), p.terms[i]));
+      } else {
+        newTerms.put(p.sorted[i], p.terms[i]);
       }
     }
 
@@ -184,11 +177,14 @@ public class Polynomial<K, F extends Ring<K, K>> {
     final F field = polyRing.coefficientField();
     final Map<Monomial, K> newTerms = new HashMap<>();
 
-    for (final Monomial m1 : sorted) {
-      for (final Monomial m2 : p.sorted) {
+    for (int i1 = 0; i1 < sorted.length; i1++) {
+      final Monomial m1 = sorted[i1];
+
+      for (int i2 = 0; i2 < p.sorted.length; i2++) {
+        final Monomial m2 = p.sorted[i2];
 
         final Monomial m12 = m1.multipliedBy(m2);
-        final K coeff = field.product(terms.get(m1), p.terms.get(m2));
+        final K coeff = field.product(terms[i1], p.terms[i2]);
 
         if (newTerms.containsKey(m12)) {
           newTerms.put(m12, field.sum(newTerms.get(m12), coeff));
@@ -202,7 +198,7 @@ public class Polynomial<K, F extends Ring<K, K>> {
   }
 
   public List<K> getCoefficients() {
-    return sorted.collect(terms::get).castToList();
+    return Stream.of(terms).collect(toList());
   }
 
   public Polynomial<K, F> scaleToOne() {
@@ -216,24 +212,24 @@ public class Polynomial<K, F extends Ring<K, K>> {
     final F field = polyRing.coefficientField();
     final Map<Monomial, K> newTerms = new HashMap<>();
 
-    for (final Map.Entry<Monomial, K> entry : terms.toMap().entrySet()) {
-      newTerms.put(entry.getKey(), field.product(entry.getValue(), scalar));
+    for (int i = 0; i < terms.length; i++) {
+      newTerms.put(sorted[i], field.product(terms[i], scalar));
     }
 
     return new Polynomial<>(polyRing, newTerms);
   }
 
   public boolean isZero() {
-    return terms.isEmpty();
+    return sorted.length == 0;
   }
 
   public K leadingCoefficient() {
-    return terms.get(sorted.get(0));
+    return terms[0];
   }
 
   public boolean anyTermMatches(final Predicate<Term<K, F>> pred) {
-    return sorted.anySatisfy(m -> pred.accept(
-      new Term<>(polyRing.coefficientField(), m, terms.get(m))
+    return IntStream.range(0, sorted.length).anyMatch(i -> pred.accept(
+      new Term<>(polyRing.coefficientField(), sorted[i], terms[i])
     ));
   }
 }

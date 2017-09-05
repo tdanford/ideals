@@ -2,6 +2,7 @@ package tdanford.ideals;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
+import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class PolynomialTest extends PolynomialTesting {
 
@@ -11,6 +12,20 @@ public class PolynomialTest extends PolynomialTesting {
 
   public static Rational ratio(final int numer, final int denom) {
     return new Rational(numer, denom);
+  }
+
+  @Test
+  public void testEquality() {
+    EqualsVerifier.forClass(Polynomial.class)
+      .withNonnullFields("terms", "sorted")
+      .withIgnoredFields("polyRing")
+      .verify();
+  }
+
+  @Test
+  public void testMultipliedBy() {
+    assertThat(kxPoly("2x^2 - 1").multipliedBy(kxPoly("3x + 3")))
+      .isEqualTo(kxPoly("6x^3 + 6x^2 -3x - 3"));
   }
 
   @Test
