@@ -40,9 +40,11 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
     for (int i = 0; i < as.length; i++) { as[i] = zero; }
 
     Polynomial<C, F> r = zero;
-    Polynomial<C, F> p = f;
+    Polynomial<C, F> p = f, prevP = zero;
 
-    while (!p.isZero()) {
+    while (!p.isZero() && !p.equals(prevP)) {
+      prevP = p;
+      //System.out.println(String.format("r=%s, p=%s", r, p));
       int i = 0;
       boolean divisionOccurred = false;
       while (i < as.length && !divisionOccurred) {

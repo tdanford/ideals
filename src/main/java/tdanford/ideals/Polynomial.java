@@ -201,6 +201,17 @@ public class Polynomial<K, F extends Ring<K, K>> {
     return new Polynomial<>(polyRing, newTerms);
   }
 
+  public List<K> getCoefficients() {
+    return sorted.collect(terms::get).castToList();
+  }
+
+  public Polynomial<K, F> scaleToOne() {
+    final K leadingCoefficient = leadingCoefficient();
+    final F ring = polyRing.coefficientField();
+    final K scalar = ring.divide(ring.one(), leadingCoefficient);
+    return scaleBy(scalar);
+  }
+
   public Polynomial<K,F> scaleBy(final K scalar) {
     final F field = polyRing.coefficientField();
     final Map<Monomial, K> newTerms = new HashMap<>();
