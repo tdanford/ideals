@@ -1,6 +1,12 @@
 package tdanford.ideals;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.Test;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
@@ -20,6 +26,13 @@ public class PolynomialTest extends PolynomialTesting {
       .withNonnullFields("terms", "sorted")
       .withIgnoredFields("polyRing")
       .verify();
+
+    assertThat(kxyPoly("y^10 - 49/48y^7 + 1/8y^4 - 3/16y"))
+      .isEqualTo(kxyPoly("y^10 - 49/48y^7 + 1/8y^4 - 3/16y"));
+
+    Set<Polynomial<Rational, Rationals>> list = new HashSet<>(Collections.singletonList(kxyPoly("y^10 - 49/48y^7 + 1/8y^4 - 3/16y")));
+    list.remove(kxyPoly("y^10 - 49/48y^7 + 1/8y^4 - 3/16y"));
+    assertThat(list).isEmpty();
   }
 
   @Test

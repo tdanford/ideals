@@ -23,11 +23,11 @@ public class Term<K, F extends Ring<K, K>> {
     return String.format("%s%s", coefficient, monomial.renderString(variables));
   }
 
-  public int hashCode() {
+  public final int hashCode() {
     return Objects.hash(coefficient, monomial);
   }
 
-  public boolean equals(final Object o) {
+  public final boolean equals(final Object o) {
     if (!(o instanceof Term)) { return false; }
     Term<K, F> t = (Term<K, F>) o;
     return Objects.equals(coefficient, t.coefficient) &&

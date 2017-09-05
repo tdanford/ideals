@@ -22,6 +22,7 @@ public class Polynomial<K, F extends Ring<K, K>> {
   private final PolynomialRing<K, F> polyRing;
   private final K[] terms;
   private final Monomial[] sorted;
+  private List<Monomial> monomials;
 
   public Polynomial(
     final PolynomialRing<K, F> polyRing,
@@ -231,6 +232,10 @@ public class Polynomial<K, F extends Ring<K, K>> {
     return IntStream.range(0, sorted.length).anyMatch(i -> pred.accept(
       new Term<>(polyRing.coefficientField(), sorted[i], terms[i])
     ));
+  }
+
+  public List<Monomial> getMonomials() {
+    return Stream.of(sorted).collect(toList());
   }
 }
 

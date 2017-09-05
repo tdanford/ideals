@@ -1,14 +1,22 @@
 package tdanford.ideals;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 import org.eclipse.collections.api.block.predicate.Predicate;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
+import com.google.common.base.Preconditions;
 
 public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K, F>> {
 
@@ -31,10 +39,16 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
   private void calculateBasis() {
 
     final ArrayList<Polynomial<K, F>> building = new ArrayList<>(spec.castToList());
+
+    if ((new HashSet<>(building)).size() != building.size()) {
+      throw new IllegalArgumentException(String.format("Building set %s contains duplicates", building));
+    }
+
     int start = 0;
 
     Set<Polynomial<K, F>> toAdjoin = new HashSet<>();
     do {
+      toAdjoin.removeAll(building);
       building.addAll(toAdjoin);
       start += toAdjoin.size();
       toAdjoin.clear();
@@ -67,18 +81,52 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
 
     scaleLeadingCoefficientsToOne();
 
+    System.out.println(String.format("Intermediate basis: %s", basis));
+    System.out.println(String.format("No dups basis: %s", new HashSet<>(basis)));
+
+    final Iterable<Polynomial<K, F>> cleared = clearDenominators(new HashSet<>(basis));
+
+    basis.clear();
+    basis.addAllIterable(cleared);
+
     if (reducingFinalBasis) {
       System.out.println("Reducing final set...");
       //basis.addAllIterable(buildingSet.filter(new ReducedPolynomialPredicate<>(lts)));
       int reduce = -1;
+      final List<Term<K, F>> leadingTerms = basis.collect(Polynomial::leadingTerm);
+      final List<String> leadingTermStrings = leadingTerms.stream().map(t -> t.renderString(polyRing.variables())).collect(toList());
+      System.out.println(String.format("Leading terms: %s", leadingTermStrings));
+
       while ((reduce = findReduciblePolynomial(basis)) != -1) {
         basis.remove(reduce);
       }
-
     }
 
     System.out.println(String.format("Final basis: %s", basis));
 
+  }
+
+  private Iterable<Polynomial<K, F>> clearDenominators(final Collection<Polynomial<K, F>> polys) {
+    Preconditions.checkArgument(polys.size() > 0);
+    return polys.stream()
+      .map(this::clearDenominatorsOnPolynomial)
+      .collect(toList());
+  }
+
+  private Polynomial<K, F> clearDenominatorsOnPolynomial(final Polynomial<K, F> poly) {
+    //System.out.println(String.format("Clearing: %s", poly));
+    if (polyRing.coefficientField() == Rationals.FIELD) {
+      //System.out.println(String.format("\trational poly: %s", poly));
+
+      @SuppressWarnings("unchecked") final List<Rational> rationalCoeffs = (List<Rational>) poly.getCoefficients();
+      final long lcm = rationalCoeffs.stream().mapToLong(Rational::getDenominator).reduce(1, Rational::lcm);
+      //System.out.println("\tLCM: " + lcm);
+      return poly.scaleBy((K) new Rational(lcm, 1));
+
+    } else {
+      //System.out.println(String.format("\tNon-rational poly: %s", poly));
+      return poly;
+    }
   }
 
   private void scaleLeadingCoefficientsToOne() {
@@ -103,7 +151,12 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
       Polynomial::leadingTerm
     ).toSet();
 
-    return poly.anyTermMatches(leadingTerms::contains);
+    boolean match = poly.anyTermMatches(t -> leadingTerms.stream().anyMatch(lt -> lt.divides(t)));
+
+    //final String ltString = leadingTerms.stream().map(t -> t.renderString(polyRing.variables())).collect(joining(", "));
+    //System.out.println(String.format("%s: %s \n\tin LTS %s", match, poly, ltString));
+
+    return match;
   }
 
 }

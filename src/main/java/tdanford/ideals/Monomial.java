@@ -21,7 +21,7 @@ public class Monomial {
     return arry;
   }
 
-  private int[] exponents;
+  private final int[] exponents;
 
   public Monomial(final int width, final int var, final int exp) {
     this(single(width, var, exp));
@@ -35,11 +35,11 @@ public class Monomial {
     this(empty(numVars));
   }
 
-  public int hashCode() {
+  public final int hashCode() {
     return Arrays.hashCode(exponents);
   }
 
-  public boolean equals(final Object o) {
+  public final boolean equals(final Object o) {
     if (!(o instanceof Monomial)) { return false; }
     final Monomial m = (Monomial) o;
     return Arrays.equals(exponents, m.exponents);

@@ -20,7 +20,12 @@ public class Rational {
     this.denom = 1;
   }
 
-  private static long gcd(final long astart, final long bstart) {
+  public static long lcm(final long v1, final long v2) {
+    final long gcd12 = gcd(v1, v2);
+    return gcd12 * (v1 / gcd12) * (v2 / gcd12);
+  }
+
+  public static long gcd(final long astart, final long bstart) {
     long a = astart, b = bstart;
     while (b != 0) {
       long t = b;
@@ -88,5 +93,12 @@ public class Rational {
     return Objects.equals(numer, r.numer) && Objects.equals(denom, r.denom);
   }
 
+  public long getDenominator() {
+    return denom;
+  }
+
+  public long getNumerator() {
+    return numer;
+  }
 }
 

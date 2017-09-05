@@ -59,7 +59,13 @@ class MonomialVisitor
 
   @Override
   public Monomial visitSingleVar(final PolynomialsParser.SingleVarContext ctx) {
+    Preconditions.checkState(vars != null);
+    Preconditions.checkState(vars.length > 0);
+    Preconditions.checkState(indices != null);
+
     final String var = ctx.var().getText();
+    Preconditions.checkState(indices.containsKey(var), String.format("indices %s must contain var %s", indices.keySet(), var));
+
     return new Monomial(vars.length, indices.get(var), 1);
   }
 
