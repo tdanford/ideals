@@ -22,7 +22,6 @@ public class Polynomial<K, F extends Ring<K, K>> {
   private final PolynomialRing<K, F> polyRing;
   private final K[] terms;
   private final Monomial[] sorted;
-  private List<Monomial> monomials;
 
   public Polynomial(
     final PolynomialRing<K, F> polyRing,
