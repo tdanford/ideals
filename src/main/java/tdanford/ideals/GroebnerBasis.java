@@ -1,18 +1,11 @@
 package tdanford.ideals;
 
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.StreamSupport;
-import org.eclipse.collections.api.block.predicate.Predicate;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -74,7 +67,6 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
     } while (!toAdjoin.isEmpty());
 
     final PolynomialSet<K, F> buildingSet = new PolynomialSet<>(building);
-    final Set<Term<K, F>> lts = buildingSet.leadingTerms();
 
     basis.clear();
     basis.addAllIterable(buildingSet);
@@ -91,7 +83,7 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
 
     if (reducingFinalBasis) {
       System.out.println("Reducing final set...");
-      //basis.addAllIterable(buildingSet.filter(new ReducedPolynomialPredicate<>(lts)));
+
       int reduce = -1;
       final List<Term<K, F>> leadingTerms = basis.collect(Polynomial::leadingTerm);
       final List<String> leadingTermStrings = leadingTerms.stream().map(t -> t.renderString(polyRing.variables())).collect(toList());
@@ -161,25 +153,3 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
 
 }
 
-class ReducedPolynomialPredicate<K, F extends Ring<K, K>> implements Predicate<Polynomial<K, F>> {
-
-  private Iterable<Term<K, F>> terms;
-
-  public ReducedPolynomialPredicate(final Iterable<Term<K, F>> terms) {
-    this.terms = terms;
-  }
-
-  public boolean isDividedByTerm(final Term<K, F> term) {
-    for (Term<K, F> other : terms) {
-      if (other.divides(term)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public boolean accept(final Polynomial<K, F> p) {
-    return !p.anyTermMatches(this::isDividedByTerm);
-  }
-}
