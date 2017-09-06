@@ -1,6 +1,7 @@
 package tdanford.ideals;
 
 import static java.util.stream.Collectors.toList;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -111,9 +112,11 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
       //System.out.println(String.format("\trational poly: %s", poly));
 
       @SuppressWarnings("unchecked") final List<Rational> rationalCoeffs = (List<Rational>) poly.getCoefficients();
-      final long lcm = rationalCoeffs.stream().mapToLong(Rational::getDenominator).reduce(1, Rational::lcm);
+      final BigInteger lcm = rationalCoeffs.stream()
+        .map(Rational::getDenominator).reduce(BigInteger.ONE, Rational::lcm);
+
       //System.out.println("\tLCM: " + lcm);
-      return poly.scaleBy((K) new Rational(lcm, 1));
+      return poly.scaleBy((K) new Rational(lcm, BigInteger.ONE));
 
     } else {
       //System.out.println(String.format("\tNon-rational poly: %s", poly));

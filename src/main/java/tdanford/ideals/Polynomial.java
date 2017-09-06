@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.eclipse.collections.api.block.predicate.Predicate;
@@ -72,6 +73,17 @@ public class Polynomial<K, F extends Ring<K, K>> {
     }
 
     checkInvariants();
+  }
+
+  public <K2, F2 extends Ring<K2, K2>> Polynomial<K2, F2> convert(
+    final PolynomialRing<K2, F2> newPolyRing,
+    final Function<K, K2> coeffConverter
+  ) {
+    final Map<Monomial, K2> newTerms = IntStream.range(0, sorted.length)
+      .boxed()
+      .collect(toMap(i -> sorted[i], i -> coeffConverter.apply(terms[i])));
+
+    return new Polynomial<>(newPolyRing, newTerms);
   }
 
   public List<Term<K, F>> getTerms() {

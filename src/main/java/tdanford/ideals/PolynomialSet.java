@@ -38,5 +38,9 @@ public class PolynomialSet<K, F extends Ring<K, K>>
   public Iterator<Polynomial<K, F>> iterator() {
     return polys.iterator();
   }
+
+  public Polynomial<K, F> get(final int i) {
+    return polys.get(i);
+  }
 }
 

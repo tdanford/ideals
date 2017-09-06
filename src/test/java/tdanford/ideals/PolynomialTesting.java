@@ -18,7 +18,7 @@ public abstract class PolynomialTesting {
     return rationalPoly(str, KXY.variables());
   }
 
-  public static PolynomialSet<Rational, Rationals> kxPolys(final String... strs) {
+  public static PolynomialSet<Rational, Rationals> kxyPolys(final String... strs) {
     return new PolynomialSet<>(
       Stream.of(strs).map(PolynomialTesting::kxyPoly).collect(toList())
     );

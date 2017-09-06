@@ -1,6 +1,12 @@
 package tdanford.ideals;
 
-public class Reals implements Field<Double> {
+import java.math.BigDecimal;
+
+public enum Reals implements Field<Double> {
+
+  FIELD
+  ;
+
   @Override
   public Double reciprocal(final Double value) {
     return 1.0 / value;
@@ -34,5 +40,11 @@ public class Reals implements Field<Double> {
   @Override
   public Double one() {
     return 1.0;
+  }
+
+  static Double fromRational(final Rational r) {
+    if (r.isZero()) { return 0.0; }
+    return new BigDecimal(r.getNumerator()).divide(new BigDecimal(r.getDenominator()))
+      .doubleValue();
   }
 }

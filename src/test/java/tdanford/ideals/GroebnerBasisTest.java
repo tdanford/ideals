@@ -1,13 +1,14 @@
 package tdanford.ideals;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static tdanford.ideals.MonomialOrdering.LEX;
 import org.junit.Test;
 
 public class GroebnerBasisTest extends PolynomialTesting {
 
   @Test
   public void testExampleUAG17() {
-    final PolynomialSet<Rational, Rationals> F = kxPolys(
+    final PolynomialSet<Rational, Rationals> F = kxyPolys(
       "x^3y - 2x^2y^2 + x",
       "3x^4 - y"
     );
@@ -16,10 +17,16 @@ public class GroebnerBasisTest extends PolynomialTesting {
       new GroebnerBasis<>(KXY, F);
 
     assertThat(basis.getBasis()).containsExactlyElementsOf(
-      kxPolys(
+      kxyPolys(
         "-9y + 48y^10 - 49y^7 + 6y^4",
         "252x - 624y^7 + 493y^4 - 3y"
       )
     );
+
+    final PolynomialRing<Double, Reals> DXY = new PolynomialRing<>(LEX, Reals.FIELD, "x", "y");
+
+    for (Polynomial<Rational, Rationals> p : basis.getBasis()) {
+      System.out.println(p.convert(DXY, Reals::fromRational));
+    }
   }
 }
