@@ -3,7 +3,7 @@ apply plugin: 'idea'
 apply plugin: 'antlr'
 
 sourceCompatibility = 1.8
-version = "0.2"
+version = "0.3"
 
 task wrapper(type: Wrapper) {
   gradleVersion = '4.1'
