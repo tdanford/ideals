@@ -7,6 +7,21 @@ import org.junit.Test;
 public class GroebnerBasisTest extends PolynomialTesting {
 
   @Test
+  public void testLinearExamples() {
+    final String[] vars = new String[] {"x", "y", "p"};
+
+    final PolynomialRing<Rational, Rationals> ring = new PolynomialRing<>(LEX, Rationals.FIELD, vars);
+
+    final PolynomialSet<Rational, Rationals> constraints =
+      rationalPolys(vars, "x + y - 2", "2x + p", "2y + p");
+
+    final GroebnerBasis<Rational, Rationals, PolynomialRing<Rational, Rationals>> basis =
+      new GroebnerBasis<>(ring, constraints);
+
+    assertThat(basis.getBasis()).containsExactly(rationalPoly(vars, "x"));
+  }
+
+  @Test
   public void testExampleUAG17() {
     final PolynomialSet<Rational, Rationals> F = kxyPolys(
       "x^3y - 2x^2y^2 + x",

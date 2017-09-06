@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.IntStream;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -85,13 +86,27 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
     if (reducingFinalBasis) {
       System.out.println("Reducing final set...");
 
-      int reduce = -1;
       final List<Term<K, F>> leadingTerms = basis.collect(Polynomial::leadingTerm);
       final List<String> leadingTermStrings = leadingTerms.stream().map(t -> t.renderString(polyRing.variables())).collect(toList());
       System.out.println(String.format("Leading terms: %s", leadingTermStrings));
 
+      /*
+      final List<Integer> reducibleSet = findAllReduciblePolynomials(basis);
+      System.out.println(String.format("Reducible set: %s", reducibleSet));
+      final List<Polynomial<K, F>> reduced = IntStream.range(0, basis.size())
+        .filter(i -> !reducibleSet.contains(i))
+        .mapToObj(basis::get)
+        .collect(toList());
+
+      basis.clear();
+      basis.addAllIterable(reduced);
+      */
+
+      int reduce = -1;
       while ((reduce = findReduciblePolynomial(basis)) != -1) {
+        System.out.println(String.format("Removing poly %d (= %s) from basis", reduce, basis.get(reduce)));
         basis.remove(reduce);
+        System.out.println(String.format("Reducing basis: %s", basis));
       }
     }
 
@@ -135,6 +150,13 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
       }
     }
     return -1;
+  }
+
+  private List<Integer> findAllReduciblePolynomials(final MutableList<Polynomial<K, F>> basis) {
+    return IntStream.range(0, basis.size())
+      .filter(i -> isReduciblePolynomial(basis.get(i), basis))
+      .boxed()
+      .collect(toList());
   }
 
   private boolean isReduciblePolynomial(
