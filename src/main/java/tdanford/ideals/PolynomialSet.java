@@ -42,5 +42,9 @@ public class PolynomialSet<K, F extends Ring<K, K>>
   public Polynomial<K, F> get(final int i) {
     return polys.get(i);
   }
+
+  public Polynomial<K, F>[] toArray() {
+    return polys.toArray(new Polynomial[polys.size()]);
+  }
 }
 

@@ -33,10 +33,10 @@ public class Rational {
   }
 
   public static BigInteger gcd(final BigInteger astart, final BigInteger bstart) {
-    BigInteger a = astart, b = bstart;
+    BigInteger a = astart, b = bstart.abs();
     while (!b.equals(BigInteger.ZERO)) {
       final BigInteger t = b;
-      b = a.mod(b);
+      b = a.mod(b).abs();
       a = t;
     }
     return a;

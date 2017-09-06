@@ -18,7 +18,9 @@ public class GroebnerBasisTest extends PolynomialTesting {
     final GroebnerBasis<Rational, Rationals, PolynomialRing<Rational, Rationals>> basis =
       new GroebnerBasis<>(ring, constraints);
 
-    assertThat(basis.getBasis()).containsExactly(rationalPoly(vars, "x"));
+    assertThat(basis.getBasis()).containsExactlyInAnyOrder(
+      rationalPolys(vars, "p+2", "y-1", "x-1").toArray()
+    );
   }
 
   @Test
@@ -31,11 +33,11 @@ public class GroebnerBasisTest extends PolynomialTesting {
     final GroebnerBasis<Rational, Rationals, PolynomialRing<Rational, Rationals>> basis =
       new GroebnerBasis<>(KXY, F);
 
-    assertThat(basis.getBasis()).containsExactlyElementsOf(
+    assertThat(basis.getBasis()).containsExactlyInAnyOrder(
       kxyPolys(
         "-9y + 48y^10 - 49y^7 + 6y^4",
         "252x - 624y^7 + 493y^4 - 3y"
-      )
+      ).toArray()
     );
 
     final PolynomialRing<Double, Reals> DXY = new PolynomialRing<>(LEX, Reals.FIELD, "x", "y");
