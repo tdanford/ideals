@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.IntStream;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
@@ -91,26 +90,6 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
       final List<String> leadingTermStrings = leadingTerms.stream().map(t -> t.renderString(polyRing.variables())).collect(toList());
       System.out.println(String.format("Leading terms: %s", leadingTermStrings));
 
-      /*
-      final List<Integer> reducibleSet = findAllReduciblePolynomials(basis);
-      System.out.println(String.format("Reducible set: %s", reducibleSet));
-      final List<Polynomial<K, F>> reduced = IntStream.range(0, basis.size())
-        .filter(i -> !reducibleSet.contains(i))
-        .mapToObj(basis::get)
-        .collect(toList());
-
-      basis.clear();
-      basis.addAllIterable(reduced);
-      */
-
-      /*
-      int reduce = -1;
-      while ((reduce = findReduciblePolynomial(basis)) != -1) {
-        System.out.println(String.format("Removing poly %d (= %s) from basis", reduce, basis.get(reduce)));
-        basis.remove(reduce);
-        System.out.println(String.format("Reducing basis: %s", basis));
-      }
-      */
       reduceBasis(basis);
     }
 
@@ -132,44 +111,21 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
   }
 
   private Polynomial<K, F> clearDenominatorsOnPolynomial(final Polynomial<K, F> poly) {
-    //System.out.println(String.format("Clearing: %s", poly));
     if (polyRing.coefficientField() == Rationals.FIELD) {
-      //System.out.println(String.format("\trational poly: %s", poly));
 
       @SuppressWarnings("unchecked") final List<Rational> rationalCoeffs = (List<Rational>) poly.getCoefficients();
       final BigInteger lcm = rationalCoeffs.stream()
         .map(Rational::getDenominator).reduce(BigInteger.ONE, Rational::lcm);
 
-      //System.out.println("\tLCM: " + lcm);
-      final Polynomial<K, F> up = poly.scaleBy((K) new Rational(lcm, BigInteger.ONE));
-
-      /*
-      @SuppressWarnings("unchecked") final List<Rational> upCeoffs = (List<Rational>) up.getCoefficients();
-      final BigInteger gcd = rationalCoeffs.stream()
-        .map(Rational::getNumerator).reduce(BigInteger.ONE, Rational::gcd);
-
-      return poly.scaleBy((K) new Rational(BigInteger.ONE, gcd));
-      */
-
-      return up;
+      return poly.scaleBy((K) new Rational(lcm, BigInteger.ONE));
 
     } else {
-      //System.out.println(String.format("\tNon-rational poly: %s", poly));
       return poly;
     }
   }
 
   private void scaleLeadingCoefficientsToOne() {
     basis.replaceAll(Polynomial::scaleToOne);
-  }
-
-  private int findReduciblePolynomial(final MutableList<Polynomial<K, F>> basis) {
-    for (int i = 0; i < basis.size(); i++) {
-      if (isReduciblePolynomial(basis.get(i), basis)) {
-        return i;
-      }
-    }
-    return -1;
   }
 
   private boolean canReduce(final Polynomial<K, F> targetPoly, final Polynomial<K, F> basisPoly) {
@@ -214,12 +170,12 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
         .filter(tterm -> basisLT.getMonomial().divides(tterm.getMonomial()))
         .collect(toList());
 
-      final Term<K, F> divTerm = divisible.get(0);
       System.out.println(String.format("\t\tdivisible: %s", divisible.stream().map(t -> t.renderString(polyRing.variables())).collect(joining(", "))));
 
       final Polynomial<K, F> scalar = polyRing.divide(reduced, basisPoly).divisors[0];
       final Polynomial<K, F> reducer = basisPoly.multipliedBy(scalar);
 
+      //final Term<K, F> divTerm = divisible.get(0);
       //final K scalar = coeffRing.divide(divTerm.getCoefficient(), basisLT.getCoefficient());
       //final Polynomial<K, F> reducer = basisPoly.scaleBy(scalar);
 
@@ -230,23 +186,5 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
     }
     return reduced;
   }
-
-  private boolean isReduciblePolynomial(
-    final Polynomial<K, F> poly,
-    final MutableList<Polynomial<K, F>> basis
-  ) {
-    final Set<Term<K, F>> leadingTerms = basis.collectIf(
-      p -> !p.equals(poly),
-      Polynomial::leadingTerm
-    ).toSet();
-
-    boolean match = poly.anyTermMatches(t -> leadingTerms.stream().anyMatch(lt -> lt.divides(t)));
-
-    //final String ltString = leadingTerms.stream().map(t -> t.renderString(polyRing.variables())).collect(joining(", "));
-    //System.out.println(String.format("%s: %s \n\tin LTS %s", match, poly, ltString));
-
-    return match;
-  }
-
 }
 

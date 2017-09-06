@@ -2,6 +2,7 @@ package tdanford.ideals;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static tdanford.ideals.MonomialOrdering.LEX;
+import static tdanford.ideals.parsing.PolynomialParser.rationalPoly;
 import org.junit.Test;
 
 public class LagrangianTest extends PolynomialTesting {
@@ -34,7 +35,7 @@ public class LagrangianTest extends PolynomialTesting {
     final PolynomialSet<Rational, Rationals> constraints =
       rationalPolys(XYZ.variables(),"x + y - 2", "x + z - 2");
 
-    final Polynomial<Rational, Rationals> lagrangian = constraints.lagrangian(rationalPoly(XYZ.variables(), "x^2 + y^2 + z^2"));
+    final Polynomial<Rational, Rationals> lagrangian = constraints.lagrangian(rationalPoly("x^2 + y^2 + z^2"));
 
     System.out.println(String.format("Lagrangian: %s", lagrangian));
 

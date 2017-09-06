@@ -21,7 +21,7 @@ public class PolynomialParserTest {
     final Rational one = Rationals.FIELD.one();
 
     final PolynomialParser<Rational, Rationals, PolynomialRing<Rational, Rationals>> parser =
-      new PolynomialParser<>(kxy, Rationals::parse);
+      new PolynomialParser<>(LEX, Rationals.FIELD, Rationals::parse, kxy.variables());
 
     assertThat(parser.apply("x^2y + xy^2 + y^2"))
       .isEqualTo(
@@ -39,7 +39,7 @@ public class PolynomialParserTest {
     final Rational one = Rationals.FIELD.one();
 
     final PolynomialParser<Rational, Rationals, PolynomialRing<Rational, Rationals>> parser =
-      new PolynomialParser<>(kx, Rationals::parse);
+      new PolynomialParser<>(LEX, Rationals.FIELD, Rationals::parse);
 
     assertThat(parser.apply("x^2 + 1"))
       .isEqualTo(new Polynomial<>(kx, Maps.mutable.of(
