@@ -21,6 +21,14 @@ public class PolynomialTest extends PolynomialTesting {
   }
 
   @Test
+  public void testPartialDerivative() {
+    assertThat(kxyPoly("xy + 2x^2").partialDerivative("x", Rationals::liftInteger))
+      .isEqualTo(kxyPoly("y + 4x"));
+    assertThat(kxyPoly("xy + 2x^2").partialDerivative("y", Rationals::liftInteger))
+      .isEqualTo(kxyPoly("x"));
+  }
+
+  @Test
   public void testEquality() {
     EqualsVerifier.forClass(Polynomial.class)
       .withNonnullFields("terms", "sorted")

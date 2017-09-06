@@ -234,8 +234,10 @@ public class Polynomial<K, F extends Ring<K, K>> {
       final int exponent = sorted[i].exponent(vidx);
 
       if (exponent > 0) {
-        final K newCoeff = cRing.product(terms[i], exponentLift.apply(exponent-1));
+        final K newCoeff = cRing.product(terms[i], exponentLift.apply(exponent));
         final Monomial newMonomial = sorted[i].oneLess(vidx);
+
+        //System.out.println(String.format("%s -> %s", newMonomial.renderString(polyRing.variables()), newCoeff));
 
         if (newTerms.containsKey(newMonomial)) {
           newTerms.put(newMonomial, cRing.sum(newTerms.get(newMonomial), newCoeff));

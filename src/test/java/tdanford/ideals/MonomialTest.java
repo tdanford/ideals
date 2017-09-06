@@ -12,6 +12,12 @@ public class MonomialTest {
   }
 
   @Test
+  public void testOneLess() {
+    assertThat(new Monomial(new int[] {1, 1}).oneLess(0)).isEqualTo(new Monomial(new int[] {0, 1}));
+    assertThat(new Monomial(new int[] {1, 1}).oneLess(1)).isEqualTo(new Monomial(new int[] {1, 0}));
+  }
+
+  @Test
   public void testToString() {
     assertThat(new Monomial(1).renderString(new String[] {"x"})).isEqualTo("");
     assertThat(new Monomial(1, 0, 1).renderString(new String[] {"x"})).isEqualTo("x");
