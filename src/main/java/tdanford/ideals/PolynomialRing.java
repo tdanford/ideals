@@ -30,6 +30,18 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
 
   public String[] variables() { return vars; }
 
+  public PolynomialRing<C, F> adjoin(final String... newVars) {
+    final String[] array = new String[vars.length + newVars.length];
+    for (int i = 0; i < array.length; i++) {
+      if (i < newVars.length) {
+        array[i] = newVars[i];
+      } else {
+        array[i] = vars[i - newVars.length];
+      }
+    }
+    return new PolynomialRing<>(ordering, coefficientField, array);
+  }
+
   public DivisorsRemainder<Polynomial<C, F>> div(final Polynomial<C, F> f, final Iterable<Polynomial<C, F>> fs) {
     return div(f, StreamSupport.stream(fs.spliterator(), false).toArray(Polynomial[]::new));
   }
@@ -119,4 +131,12 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
     return div(numer, denom);
   }
 
+  public int indexOf(final String var) {
+    for (int i = 0; i < vars.length; i++) {
+      if (vars[i].equals(var)) {
+        return i;
+      }
+    }
+    return -1;
+  }
 }

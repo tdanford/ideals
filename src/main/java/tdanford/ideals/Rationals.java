@@ -22,6 +22,10 @@ public enum Rationals implements Field<Rational> {
     }
   }
 
+  public static Rational liftInteger(final Integer v) {
+    return new Rational((long) v, 1L);
+  }
+
   @Override
   public Rational reciprocal(Rational value) {
     return value.inverse();

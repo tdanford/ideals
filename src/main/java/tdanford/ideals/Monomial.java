@@ -1,7 +1,9 @@
 package tdanford.ideals;
 
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toMap;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -121,6 +123,25 @@ public class Monomial {
     return new Monomial(newExp);
   }
 
+  public Monomial changeVars(final String[] oldVars, final String[] newVars) {
+    Preconditions.checkArgument(oldVars != null);
+    Preconditions.checkArgument(newVars != null);
+    Preconditions.checkArgument(oldVars.length == exponents.length);
+
+    final Map<String, Integer> newMap = IntStream.range(0, newVars.length).boxed()
+      .collect(toMap(i -> newVars[i], i -> i));
+
+    final int[] newExp = new int[newVars.length];
+    for (int i = 0; i < newExp.length; i++) { newExp[i] = 0; }
+
+    for (int i = 0; i < oldVars.length; i++) {
+      if (newMap.containsKey(oldVars[i])) {
+        newExp[newMap.get(oldVars[i])] = exponents[i];
+      }
+    }
+    return new Monomial(newExp);
+  }
+
 
   public static Monomial zero(final int len) {
     final int[] arr = new int[len];
@@ -144,5 +165,13 @@ public class Monomial {
 
   public int degree() {
     return IntStream.of(exponents).sum();
+  }
+
+  public Monomial oneLess(final int vidx) {
+    final int[] array = new int[exponents.length];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = i == vidx ? exponents[i] - 1 : exponents[i];
+    }
+    return new Monomial(array);
   }
 }

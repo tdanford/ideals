@@ -92,6 +92,18 @@ public class Polynomial<K, F extends Ring<K, K>> {
       .collect(toList());
   }
 
+  public Map<Monomial, K> getTermMap() {
+    return getTermMap(polyRing);
+  }
+
+  public Map<Monomial, K> getTermMap(final PolynomialRing<K, F> ring) {
+    return IntStream.range(0, sorted.length).boxed()
+      .collect(toMap(
+        i -> sorted[i].changeVars(polyRing.variables(), ring.variables()),
+        i -> terms[i]
+      ));
+  }
+
   public String toString() {
     final K one = polyRing.coefficientField().one();
     return String.format("%s", IntStream.range(0, sorted.length).mapToObj(
@@ -213,6 +225,29 @@ public class Polynomial<K, F extends Ring<K, K>> {
     return Stream.of(terms).collect(toList());
   }
 
+  public Polynomial<K, F> partialDerivative(final String var, final Function<Integer, K> exponentLift) {
+    final Map<Monomial, K> newTerms = Maps.mutable.empty();
+    final Ring<K, K> cRing = polyRing.coefficientField();
+    final int vidx = polyRing.indexOf(var);
+
+    for (int i = 0; i < sorted.length; i++) {
+      final int exponent = sorted[i].exponent(vidx);
+
+      if (exponent > 0) {
+        final K newCoeff = cRing.product(terms[i], exponentLift.apply(exponent-1));
+        final Monomial newMonomial = sorted[i].oneLess(vidx);
+
+        if (newTerms.containsKey(newMonomial)) {
+          newTerms.put(newMonomial, cRing.sum(newTerms.get(newMonomial), newCoeff));
+        } else {
+          newTerms.put(newMonomial, newCoeff);
+        }
+      }
+    }
+
+    return new Polynomial<>(polyRing, newTerms);
+  }
+
   public Polynomial<K, F> scaleToOne() {
     final K leadingCoefficient = leadingCoefficient();
     final F ring = polyRing.coefficientField();
@@ -247,6 +282,20 @@ public class Polynomial<K, F extends Ring<K, K>> {
 
   public List<Monomial> getMonomials() {
     return Stream.of(sorted).collect(toList());
+  }
+
+  public Polynomial<K, F> changeRing(final PolynomialRing<K, F> newRing) {
+    return new Polynomial<>(newRing, getTermMap(newRing));
+  }
+
+  public PolynomialRing<K,F> getPolyRing() {
+    return polyRing;
+  }
+
+  public PolynomialSet<K, F> allPartials(final Function<Integer, K> liftInteger) {
+    return new PolynomialSet<>(polyRing,
+      Stream.of(polyRing.variables()).map(v -> this.partialDerivative(v, liftInteger)).collect(toList())
+      );
   }
 }
 

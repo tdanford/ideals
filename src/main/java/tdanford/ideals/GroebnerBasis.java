@@ -34,7 +34,8 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
 
   private void calculateBasis() {
 
-    final ArrayList<Polynomial<K, F>> building = new ArrayList<>(spec.castToList());
+    final ArrayList<Polynomial<K, F>> building =
+      new ArrayList<>(spec.castToList().stream().filter(p -> !p.isZero()).collect(toList()));
 
     if ((new HashSet<>(building)).size() != building.size()) {
       throw new IllegalArgumentException(String.format("Building set %s contains duplicates", building));
@@ -69,7 +70,7 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
 
     } while (!toAdjoin.isEmpty());
 
-    final PolynomialSet<K, F> buildingSet = new PolynomialSet<>(building);
+    final PolynomialSet<K, F> buildingSet = new PolynomialSet<>(polyRing, building);
 
     basis.clear();
     basis.addAllIterable(buildingSet);

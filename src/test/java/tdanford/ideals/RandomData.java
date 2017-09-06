@@ -45,6 +45,6 @@ public interface RandomData {
       list.add(randomPolynomial(rand, polyRing));
     }
 
-    return new PolynomialSet<>(list);
+    return new PolynomialSet<>(polyRing, list);
   }
 }

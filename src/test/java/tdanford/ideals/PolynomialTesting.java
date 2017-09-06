@@ -20,7 +20,7 @@ public abstract class PolynomialTesting {
   }
 
   public static PolynomialSet<Rational, Rationals> kxyPolys(final String... strs) {
-    return new PolynomialSet<>(
+    return new PolynomialSet<>(KXY,
       Stream.of(strs).map(PolynomialTesting::kxyPoly).collect(toList())
     );
   }
@@ -34,7 +34,7 @@ public abstract class PolynomialTesting {
     final String... polyStrings
   ) {
     final PolynomialRing<Rational, Rationals> ring = new PolynomialRing<>(LEX, Rationals.FIELD, vars);
-    return new PolynomialSet<>(
+    return new PolynomialSet<>(ring,
       Stream.of(polyStrings).map(str -> rationalPoly(vars, str)).collect(toList())
     );
   }
