@@ -32,14 +32,6 @@ decimal : '-' ? FLOATING_POINT ;
 exponent : INTEGRAL ;
 var : VARIABLE ;
 
-/* Lexer rules
-
-Order matters here: rules that appear first are matched first, even if a rule that appears later
-would also match. For example "FALSE" is matched as K_FALSE even though it could be matched as
-an IDENTIFIER.
-*/
-
-// Keywords
 SEP : ';';
 
 VARIABLE
@@ -62,10 +54,7 @@ SPACES
   ;
 
 fragment ESC : '\\' (['\\/bfnrt] | 'u' HEX HEX HEX HEX);
-
 fragment DIGIT : [0-9];
-
-// A hexadecimal digit
 fragment HEX : [0-9a-fA-F];
 
 fragment A : [aA];
