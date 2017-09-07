@@ -137,8 +137,10 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
   private void reduceBasis(final MutableList<Polynomial<K, F>> basis) {
     boolean didReduce;
     do {
+
       System.out.println(String.format("*** REDUCING %s", basis));
       didReduce = false;
+
       for (int i = 0; i < basis.size(); i++) {
         System.out.println(String.format("REDUCING POLY %d: %s", i, basis));
         final Polynomial<K, F> target = basis.get(i);
@@ -174,10 +176,6 @@ public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K,
 
       final Polynomial<K, F> scalar = polyRing.divide(reduced, basisPoly).divisors[0];
       final Polynomial<K, F> reducer = basisPoly.multipliedBy(scalar);
-
-      //final Term<K, F> divTerm = divisible.get(0);
-      //final K scalar = coeffRing.divide(divTerm.getCoefficient(), basisLT.getCoefficient());
-      //final Polynomial<K, F> reducer = basisPoly.scaleBy(scalar);
 
       System.out.println(String.format("\t\tscalar %s -> reducer %s", scalar, reducer));
       reduced = polyRing.subtract(reduced, reducer);

@@ -1,6 +1,8 @@
 package tdanford.ideals;
 
+import static java.util.stream.Collectors.toMap;
 import java.util.Collections;
+import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 import org.eclipse.collections.impl.factory.Maps;
@@ -12,6 +14,7 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
   private final MonomialOrdering ordering;
   private final F coefficientField;
   private final String[] vars;
+  private final Map<String, Integer> varIndexMap;
 
   public PolynomialRing(
     final MonomialOrdering ordering,
@@ -21,6 +24,9 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
     this.coefficientField = coefficientField;
     this.ordering = ordering;
     this.vars = vars;
+    this.varIndexMap = IntStream.range(0, vars.length).boxed().collect(toMap(
+      i -> vars[i], i -> i
+    ));
   }
 
   public MonomialOrdering getOrdering() {
@@ -144,5 +150,9 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
       }
     }
     return -1;
+  }
+
+  public int varIdx(final String s) {
+    return varIndexMap.get(s);
   }
 }

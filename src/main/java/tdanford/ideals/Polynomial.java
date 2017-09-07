@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.eclipse.collections.api.block.predicate.Predicate;
@@ -105,8 +107,10 @@ public class Polynomial<K, F extends Ring<K, K>> {
   }
 
   public String toString() {
+    checkInvariants();
+
     final K one = polyRing.coefficientField().one();
-    return String.format("%s", IntStream.range(0, sorted.length).mapToObj(
+    final String str = IntStream.range(0, sorted.length).mapToObj(
       i -> !terms[i].equals(one) ?
         String.format("%s%s", terms[i], sorted[i].renderString(polyRing.variables())) :
         (sorted[i].isZero() ? "1" : String.valueOf(sorted[i].renderString(polyRing.variables()))))
@@ -117,8 +121,14 @@ public class Polynomial<K, F extends Ring<K, K>> {
           return String.format("%s + %s", a, b);
         }
         })
-      .orElse("0")
-    );
+      .orElse("0");
+
+    if (str.equals("0")) {
+      Preconditions.checkState(sorted.length == 0);
+      Preconditions.checkState(isZero());
+    }
+
+    return str;
   }
 
   public final int hashCode() {
@@ -162,6 +172,17 @@ public class Polynomial<K, F extends Ring<K, K>> {
 
   public Monomial leadingMonomial() {
     return sorted[0];
+  }
+
+  private boolean monomialContainsOnlyVariables(final Monomial m, final Set<Integer> varIndices) {
+    return IntStream.range(0, m.width())
+      .filter(i -> !varIndices.contains(i))
+      .noneMatch(i -> m.exponent(i) > 0);
+  }
+
+  public boolean containsOnlyVariables(final String... vars) {
+    final Set<Integer> inds = Stream.of(vars).map(polyRing::varIdx).collect(Collectors.toSet());
+    return Stream.of(sorted).allMatch(m -> monomialContainsOnlyVariables(m, inds));
   }
 
   public Term<K, F> leadingTerm() {
