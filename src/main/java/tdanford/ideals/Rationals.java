@@ -78,7 +78,7 @@ public enum Rationals implements Field<Rational> {
     final double fractionalPart = v - (double) integralPart;
     final long fractionalDenom = fractionalPart != 0.0 ? (long) (numer / fractionalPart) : 1L;
 
-    LOG.info("fromDouble(integralPart={}, fractionalPart={}, numer={}, fractionalDenom={})",
+    LOG.debug("fromDouble(integralPart={}, fractionalPart={}, numer={}, fractionalDenom={})",
       integralPart, fractionalPart, numer, fractionalDenom);
 
     return new Rational(integralPart, 1L).sum(new Rational((long) numer, fractionalDenom));
