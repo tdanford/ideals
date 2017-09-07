@@ -1,6 +1,7 @@
 package tdanford.ideals;
 
 import java.util.Collections;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 import org.eclipse.collections.impl.factory.Maps;
 import com.google.common.base.Preconditions;
@@ -106,6 +107,11 @@ public class PolynomialRing<C, F extends Ring<C, C>> implements
   @Override
   public Polynomial<C, F> negative(final Polynomial<C, F> value) {
     return value.scaleBy(coefficientField.negative(coefficientField.one()));
+  }
+
+  @Override
+  public Polynomial<C, F> pow(final Polynomial<C, F> p, final int k) {
+    return IntStream.range(0, k).mapToObj(i -> p).reduce(one(), this::product);
   }
 
   @Override

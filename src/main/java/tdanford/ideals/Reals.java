@@ -8,6 +8,11 @@ public enum Reals implements Field<Double> {
   ;
 
   @Override
+  public Double pow(final Double value, final int k) {
+    return Math.pow(value, (double)k);
+  }
+
+  @Override
   public Double reciprocal(final Double value) {
     return 1.0 / value;
   }

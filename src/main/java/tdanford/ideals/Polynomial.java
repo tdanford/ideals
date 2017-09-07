@@ -170,10 +170,12 @@ public class Polynomial<K, F extends Ring<K, K>> {
     return new Term<>(polyRing.coefficientField(), sorted[0], terms[0]);
   }
 
-  public K evaluate(K[] values) {
-    K sum = polyRing.coefficientField().zero();
-    for (Monomial m : sorted) {
-      sum = polyRing.coefficientField().sum(sum, m.evaluate(values, polyRing.coefficientField()));
+  public K evaluate(K... values) {
+    F field = polyRing.coefficientField();
+    K sum = field.zero();
+    for (int i = 0; i < sorted.length; i++) {
+      final K term = field.product(terms[i], sorted[i].evaluate(values, field));
+      sum = polyRing.coefficientField().sum(sum, term);
     }
     return sum;
   }

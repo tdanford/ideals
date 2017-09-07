@@ -6,6 +6,8 @@ public interface Ring<T, DivResult> {
 
   T product(T p1, T p2);
 
+  T pow(T value, int k);
+
   T sum(T a1, T a2);
 
   T negative(T value);

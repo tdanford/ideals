@@ -1,5 +1,6 @@
 package tdanford.ideals;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 import com.google.common.base.Preconditions;
@@ -18,7 +19,7 @@ public class Rational {
 
     Preconditions.checkArgument(
       !this.denom.equals(BigInteger.ZERO) || this.numer.equals(BigInteger.ZERO),
-      "Cannot have zero denominator without zero numerator");
+      String.format("Cannot have zero denominator without zero numerator (found %s / %s)", num, denom));
     reduce();
   }
 
@@ -108,6 +109,37 @@ public class Rational {
 
   public BigInteger getNumerator() {
     return numer;
+  }
+
+  private static boolean lessThan(
+    final BigInteger n1,
+    final BigInteger d1,
+    final BigInteger n2,
+    final BigInteger d2
+  ) {
+
+    if (d1.equals(d2)) {
+      return n1.compareTo(n2) < 0;
+    } else {
+      return lessThan(n1.multiply(d2), d1.multiply(d2), n2.multiply(d1), d2.multiply(d1));
+    }
+  }
+
+  public double doubleValue() {
+    if (denom.equals(BigInteger.ZERO)) { return 0.0; }
+    return numer.doubleValue() / denom.doubleValue();
+  }
+
+  public boolean lessThan(final Rational other) {
+    return lessThan(numer, denom, other.numer, other.denom);
+  }
+
+  public Rational abs() {
+    return new Rational(numer.abs(), denom);
+  }
+
+  public Rational pow(final int k) {
+    return new Rational(numer.pow(k), denom.pow(k));
   }
 }
 

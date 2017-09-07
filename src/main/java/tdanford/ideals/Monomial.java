@@ -48,28 +48,14 @@ public class Monomial {
   }
 
   public <K, D, F extends Ring<K, D>> K evaluate(final K[] values, final F ring) {
-    K result = ring.zero();
+    K result = ring.one();
 
     for (int i = 0; i < exponents.length; i++) {
       if (exponents[i] > 0) {
-        result = ring.product(result, exponentiate(ring, values[i], exponents[i]));
+        result = ring.product(result, ring.pow(values[i], exponents[i]));
       }
     }
 
-    return result;
-  }
-
-  private <K, D, F extends Ring<K, D>> K exponentiate(final F ring, K base, int exp) {
-    K result = base;
-    while (exp > 1) {
-      if (exp % 2 == 0) {
-        exp /= 2;
-        result = ring.product(result, result);
-      } else {
-        exp -= 1;
-        result = ring.product(result, base);
-      }
-    }
     return result;
   }
 
