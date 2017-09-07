@@ -41,10 +41,13 @@ public class PolynomialView<K, F extends Ring<K, K>> {
   }
 
   public void paint(final Graphics2D g, final int gx1, final int gy1, final int gx2, final int gy2) {
-    g.setColor(Color.black);
+
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
     final int gw = gx2 - gx1;
     final int gh = gy2 - gy1;
+
+    g.setColor(Color.blue);
 
     if (viewport.containsX(0.0)) {
       int yline = gy2 - scaleFrac(viewport.xfrac(0.0), gh);
@@ -55,6 +58,9 @@ public class PolynomialView<K, F extends Ring<K, K>> {
       int xline = gx1 + scaleFrac(viewport.yfrac(0.0), gw);
       g.drawLine(xline, gy1, xline, gy2);
     }
+
+    g.setColor(Color.black);
+    g.setStroke(new BasicStroke(2.0f));
 
     int px = -1, py = -1;
     int x = px, y = py;
