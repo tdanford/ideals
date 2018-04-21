@@ -1,8 +1,8 @@
 package tdanford.ideals;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
+
 import com.google.common.base.Preconditions;
 
 public class Rational {

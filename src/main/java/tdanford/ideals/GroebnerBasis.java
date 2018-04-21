@@ -2,15 +2,18 @@ package tdanford.ideals;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.impl.factory.Lists;
+
 import com.google.common.base.Preconditions;
 
 public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K, F>> {

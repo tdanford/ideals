@@ -1,11 +1,14 @@
 package tdanford.ideals;
 
 import static java.util.stream.Collectors.toMap;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
+
 import org.eclipse.collections.impl.factory.Maps;
+
 import com.google.common.base.Preconditions;
 
 public class PolynomialRing<C, F extends Ring<C, C>> implements

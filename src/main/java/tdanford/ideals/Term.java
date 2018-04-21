@@ -1,6 +1,7 @@
 package tdanford.ideals;
 
 import java.util.Objects;
+
 import com.google.common.base.Preconditions;
 
 public class Term<K, F extends Ring<K, K>> {

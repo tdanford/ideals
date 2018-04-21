@@ -2,6 +2,7 @@ package tdanford.ideals;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,11 +14,13 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
 import org.eclipse.collections.api.block.predicate.Predicate;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.factory.Maps;
+
 import com.google.common.base.Preconditions;
 
 public class Polynomial<K, F extends Ring<K, K>> {

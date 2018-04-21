@@ -2,11 +2,11 @@ package tdanford.ideals;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toMap;
+
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
+
 import com.google.common.base.Preconditions;
 
 public class Monomial {
