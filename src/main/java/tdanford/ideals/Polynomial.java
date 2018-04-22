@@ -110,13 +110,20 @@ public class Polynomial<K, F extends Ring<K, K>> {
   }
 
   public String toString() {
+    return renderString("");
+  }
+
+  public String renderString(final String multiplier) {
     checkInvariants();
 
     final K one = polyRing.coefficientField().one();
     final String str = IntStream.range(0, sorted.length).mapToObj(
       i -> !terms[i].equals(one) ?
-        String.format("%s%s", terms[i], sorted[i].renderString(polyRing.variables())) :
-        (sorted[i].isZero() ? "1" : String.valueOf(sorted[i].renderString(polyRing.variables()))))
+        String.format("%s%s%s", terms[i], multiplier, sorted[i].renderString(polyRing.variables(),
+          multiplier)) :
+        (sorted[i].isZero()
+          ? "1"
+          : String.valueOf(sorted[i].renderString(polyRing.variables(), multiplier))))
       .reduce((a, b) -> {
         if (b.startsWith("-")) {
           return String.format("%s - %s", a, b.substring(1));

@@ -141,12 +141,16 @@ public class Monomial {
   }
 
   public String renderString(final String[] variables) {
+    return renderString(variables, "");
+  }
+
+  public String renderString(final String[] variables, final String multiplier) {
     return IntStream.range(0, variables.length)
       .filter(i -> exponents[i] != 0)
       .mapToObj(i -> exponents[i] > 1 ?
         String.format("%s^%d", variables[i], exponents[i]) :
         variables[i])
-      .collect(joining("")).trim();
+      .collect(joining(multiplier)).trim();
   }
 
   public int degree() {
