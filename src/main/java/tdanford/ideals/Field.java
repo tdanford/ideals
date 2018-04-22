@@ -3,7 +3,7 @@ package tdanford.ideals;
 /**
  * A Ring with multiplicative inverses.
  *
- * @param <T>
+ * @param <T> The type of the values in this field
  */
 public interface Field<T> extends Ring<T, T> {
 

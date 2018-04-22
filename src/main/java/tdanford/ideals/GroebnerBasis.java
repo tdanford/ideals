@@ -16,6 +16,12 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import com.google.common.base.Preconditions;
 
+/**
+ *
+ * @param <K>
+ * @param <F>
+ * @param <PR>
+ */
 public class GroebnerBasis<K, F extends Ring<K, K>, PR extends PolynomialRing<K, F>> {
 
   private final PR polyRing;

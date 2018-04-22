@@ -1,5 +1,11 @@
 package tdanford.ideals;
 
+/**
+ *
+ * @param <T> The type of the value in this Ring
+ * @param <DivResult> The type of the result of division in the Ring (this isn't the same as T since
+ *                   the Ring might not be a Field)
+ */
 public interface Ring<T, DivResult> {
 
   T[] array(int length);
