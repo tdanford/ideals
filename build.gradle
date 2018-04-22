@@ -35,6 +35,7 @@ dependencies {
 
     compile libs.gsCollections
     compile libs.commonsLang
+    compile libs.commonsIO
     compile libs.guava
     compile libs.slf4j
 
