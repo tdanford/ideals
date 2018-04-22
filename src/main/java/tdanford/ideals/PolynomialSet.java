@@ -1,5 +1,7 @@
 package tdanford.ideals;
 
+import static java.util.stream.Collectors.joining;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.IntStream;
@@ -36,6 +38,12 @@ public class PolynomialSet<K, F extends Ring<K, K>>
 
   public Set<Term<K, F>> leadingTerms() {
     return Sets.mutable.ofAll(polys.collect(Polynomial::leadingTerm));
+  }
+
+  public String toString() {
+    return String.format("{%s}",
+      polys.collect(Polynomial::toString).castToList().stream().collect(joining(", "))
+    );
   }
 
   public Polynomial<K, F> lagrangian(final Polynomial<K, F> objective) {
