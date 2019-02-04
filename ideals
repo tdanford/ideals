@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ideals_path=`dirname $0`
+
+src/main/python/ideals.py $ideals_path "$@"
