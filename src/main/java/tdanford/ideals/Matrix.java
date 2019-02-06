@@ -1,5 +1,8 @@
 package tdanford.ideals;
 
+import java.util.Iterator;
+import java.util.stream.StreamSupport;
+
 public class Matrix<V, F extends Field<V>> {
 
   private F ops;
@@ -46,6 +49,61 @@ public class Matrix<V, F extends Field<V>> {
         flat[i] = r == c ? diagonal[r] : ops.zero();
       }
     }
+  }
+
+  private class SkipIterator implements Iterator<V> {
+
+    private final int start;
+    private final int skip;
+    private final int end;
+    private int next;
+
+    public SkipIterator(final int start, final int end, final int skip) {
+      this.start = start;
+      this.skip = skip;
+      this.end = end;
+      this.next = start;
+    }
+
+    @Override
+    public boolean hasNext() {
+      return next < end;
+    }
+
+    @Override
+    public V next() {
+      final V n = hasNext() ? flat[next] : null;
+      next = next + skip;
+      return n;
+    }
+  }
+
+  public V[] getColumn(final int c) {
+    return StreamSupport.stream(column(c).spliterator(), false).toArray(ops::array);
+  }
+
+  public V[] getRow(final int r) {
+    return StreamSupport.stream(row(r).spliterator(), false).toArray(ops::array);
+  }
+
+  public Iterable<V> column(final int c) {
+    return () -> iterateColumn(c);
+  }
+
+  public Iterable<V> row(final int r) {
+    return () -> iterateRow(r);
+  }
+
+  public Iterator<V> iterateColumn(final int c) {
+    return rowMajor ?
+      new SkipIterator(c, flat.length, cols) :
+      new SkipIterator(c * rows, (c + 1) * rows, 1);
+  }
+
+  public Iterator<V> iterateRow(final int r) {
+    return rowMajor ?
+      new SkipIterator(r * cols, (r + 1) * cols, 1) :
+      new SkipIterator(r, flat.length, rows);
   }
 
   /**
