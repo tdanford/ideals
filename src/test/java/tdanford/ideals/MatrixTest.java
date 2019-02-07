@@ -23,6 +23,38 @@ public class MatrixTest {
     }
 
     @Test
+    public void testIsSquare() {
+      assertTrue(
+        matrix(2, 2, r(1,5), r(2,5), r(3,5), r(4,5)).isSquare()
+      );
+      assertTrue(
+        matrix(1, 1, r(1,5)).isSquare()
+      );
+      assertFalse(
+        matrix(1, 2, r(1,5), r(2, 4)).isSquare()
+      );
+      assertFalse(
+        matrix(1, 2, r(1,5), r(2, 4)).isSquare()
+      );
+    }
+
+    @Test
+    public void testCol() {
+        assertArrayEquals(
+          matrix(2, 2, r(1,5), r(2,5), r(3,5), r(4,5)).getColumn(0),
+          array(r(1, 5), r(3, 5))
+        );
+        assertArrayEquals(
+          matrix(2, 2, r(1,5), r(2,5), r(3,5), r(4,5)).getColumn(1),
+          array(r(2, 5), r(4, 5))
+        );
+        assertArrayEquals(
+          matrix(2, 2, r(1,5), r(2,5), r(3,5), r(4,5)).transpose().getColumn(1),
+          array(r(3, 5), r(4, 5))
+        );
+    }
+
+    @Test
     public void testRow() {
         assertArrayEquals(
           matrix(2, 2, r(1,5), r(2,5), r(3,5), r(4,5)).getRow(0),
