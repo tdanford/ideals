@@ -3,6 +3,8 @@ package tdanford.ideals;
 import java.util.Iterator;
 import java.util.stream.StreamSupport;
 
+import com.google.common.base.Preconditions;
+
 public class Matrix<V, F extends Field<V>> {
 
   private F ops;
@@ -201,12 +203,8 @@ public class Matrix<V, F extends Field<V>> {
   }
 
   private Matrix<V, F> multiply(Matrix<V, F> multiplicand) {
-    if (multiplicand == null) {
-      throw new IllegalArgumentException();
-    }
-    if (cols != multiplicand.rows) {
-      throw new IllegalArgumentException();
-    }
+    Preconditions.checkArgument(multiplicand != null);
+    Preconditions.checkArgument(cols == multiplicand.rows);
 
     V[] newFlat = ops.array(rows * multiplicand.cols);
     for (int r = 0, i = 0; r < rows; r++) {
@@ -223,18 +221,11 @@ public class Matrix<V, F extends Field<V>> {
   }
 
   public V rowColumnInnerProduct(int row, Matrix<V, F> other, int col) {
-    if (other == null) {
-      throw new IllegalArgumentException();
-    }
-    if (row < 0 || row >= rows) {
-      throw new IllegalArgumentException(String.format("Row %d not in [%d, %d)", row, 0, rows));
-    }
-    if (col < 0 || col >= other.cols) {
-      throw new IllegalArgumentException(String.format("Col %d not in [%d, %d)", col, 0, other.cols));
-    }
-    if (cols != other.rows) {
-      throw new IllegalArgumentException("Inner row/column dimensions don't match");
-    }
+    Preconditions.checkArgument(other != null);
+    Preconditions.checkArgument(row >= 0 && row < rows, String.format("Row %d not in [%d, %d)", row, 0, rows));
+    Preconditions.checkArgument(col >= 0 && col < cols, String.format("Col %d not in [%d, %d)", col, 0, other.cols));
+    Preconditions.checkArgument(cols == other.rows, "Inner row/column dimensions don't match");
+
     V sum = ops.zero();
     for (int i = 0; i < cols; i++) {
       sum = ops.sum(sum, ops.product(get(row, i), other.get(i, col)));
@@ -243,12 +234,8 @@ public class Matrix<V, F extends Field<V>> {
   }
 
   public Matrix<V, F> add(Matrix<V, F> addend) {
-    if (addend == null) {
-      throw new IllegalArgumentException();
-    }
-    if (rows != addend.rows || cols != addend.cols) {
-      throw new IllegalArgumentException();
-    }
+    Preconditions.checkArgument(addend != null);
+    Preconditions.checkArgument(rows == addend.rows && cols == addend.cols);
 
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
@@ -266,6 +253,10 @@ public class Matrix<V, F extends Field<V>> {
   }
 
   public Matrix<V, F> subtractScaledRow(int row, V scale, int fromRow) {
+    Preconditions.checkArgument(row >= 0 && row < rows);
+    Preconditions.checkArgument(scale != null);
+    Preconditions.checkArgument(fromRow >= 0 && fromRow < rows);
+
     for (int c = 0, i = fromRow * cols; c < cols; c++, i++) {
       V addend = ops.negative(ops.product(scale, get(row, c)));
       flat[i] = ops.sum(flat[i], addend);
@@ -274,6 +265,9 @@ public class Matrix<V, F extends Field<V>> {
   }
 
   public Matrix<V, F> subtractScaledRowFromAll(int row, V scale) {
+    Preconditions.checkArgument(row >= 0 && row < rows);
+    Preconditions.checkArgument(scale != null);
+
     for (int r = 0; r < rows; r++) {
       if (r != row) {
         subtractScaledRow(row, scale, r);
