@@ -4,6 +4,9 @@
 gradle/
 build/
 out/
+.settings 
+.vscode
+.project
 
 src/generated/
 
