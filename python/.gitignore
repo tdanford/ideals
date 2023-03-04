@@ -1,0 +1,9 @@
+*.egg-info
+__pycache__/ 
+.pytest_cache/ 
+.mypy_cache/ 
+
+.vscode 
+.coverage
+coverage.xml 
+cov.xml
